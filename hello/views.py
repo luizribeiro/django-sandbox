@@ -1,20 +1,18 @@
-from django.shortcuts import render
 from django.http import HttpResponse
+from django.shortcuts import render
+from nest import Nest
+from os import environ as env
 
-from .models import Greeting
-
-# Create your views here.
-def index(request):
-    # return HttpResponse('Hello from Python!')
-    return render(request, 'index.html')
-
-
-def db(request):
-
-    greeting = Greeting()
-    greeting.save()
-
-    greetings = Greeting.objects.all()
-
-    return render(request, 'db.html', {'greetings': greetings})
+def nest(request):
+    nest = Nest(
+        client_id=env.get('NEST_CLIENT_ID'),
+        client_secret=env.get('NEST_CLIENT_SECRET'),
+        access_token=env.get('NEST_ACCESS_TOKEN'),
+    )
+    thermostat = nest.thermostats[0]
+    return HttpResponse(
+        'Hello! The current temperature is {0:.1f}'.format(
+            thermostat.temperature,
+        ),
+    )
 
