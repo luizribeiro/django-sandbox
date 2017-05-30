@@ -1,6 +1,6 @@
 {
   "name": "python-getting-started",
-  "version": "0.1",
+  "version": "1.2.0",
   "author": "Luiz Ribeiro <luizribeiro@gmail.com>",
   "scripts": {
     "heroku-postbuild": "webpack -p --config ./webpack.config.js --progress"
