@@ -3,8 +3,7 @@
   "version": "0.1",
   "author": "Luiz Ribeiro <luizribeiro@gmail.com>",
   "scripts": {
-    "postinstall": "./node_modules/webpack/bin/webpack.js",
-    "webpack": "./node_modules/webpack/bin/webpack.js --progress --colors --watch"
+    "heroku-postbuild": "webpack -p --config ./webpack.config.js --progress"
   },
   "engines": {
     "node": "7.10.0"
