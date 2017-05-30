@@ -1,3 +1,7 @@
 from django.test import TestCase
 
-# Create your tests here.
+
+class HelloTest(TestCase):
+    def test_nothing(self):
+        pass
+
