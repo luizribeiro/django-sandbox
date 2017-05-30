@@ -5,7 +5,7 @@ python:
 
 env:
   global:
-    - DJANGO_SETTINGS_MODULE="gettingstarted.settings"
+    - DJANGO_SETTINGS_MODULE="sandbox.settings"
     - PYTHONPATH="/home/travis/build/luizribeiro/django-settings"
     - PIP_USE_MIRRORS=true
     - BUILD_ON_TRAVIS=true
