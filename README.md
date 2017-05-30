@@ -1,5 +1,7 @@
 # django-sandbox
 
+[![Build Status](https://travis-ci.org/luizribeiro/django-sandbox.svg?branch=master)](https://travis-ci.org/luizribeiro/django-sandbox)
+
 ```sh
 $ heroku create
 $ yarn
