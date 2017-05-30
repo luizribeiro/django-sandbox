@@ -1,7 +1,8 @@
 import React from 'react';
+import {Button} from 'react-bootstrap';
 
 export default function Hello() {
   return (
-    <h1>Hello</h1>
+    <Button>Hello</Button>
   );
 }
