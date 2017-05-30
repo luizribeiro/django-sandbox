@@ -3,6 +3,7 @@ from django.shortcuts import render
 from nest import Nest
 from os import environ as env
 
+
 def nest(request):
     nest = Nest(
         client_id=env.get('NEST_CLIENT_ID'),
@@ -15,4 +16,8 @@ def nest(request):
             thermostat.temperature,
         ),
     )
+
+
+def react(request):
+    return render(request, 'index.html')
 
