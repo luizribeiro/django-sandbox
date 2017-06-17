@@ -1,10 +1,13 @@
-from django.http import HttpResponse
+from django.http import (
+    HttpRequest,
+    HttpResponse,
+)
 from django.shortcuts import render
 from nest import Nest
 from os import environ as env
 
 
-def nest(request):
+def nest(request: HttpRequest) -> HttpResponse:
     nest = Nest(
         client_id=env.get('NEST_CLIENT_ID'),
         client_secret=env.get('NEST_CLIENT_SECRET'),
@@ -18,6 +21,6 @@ def nest(request):
     )
 
 
-def react(request):
+def react(request: HttpRequest) -> HttpResponse:
     return render(request, 'index.html')
 
