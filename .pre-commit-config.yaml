@@ -2,7 +2,8 @@
     sha: v0.0.1
     hooks:
     -   id: prettier
--   repo: https://github.com/d1ff/pre-commit-mypy
-    sha: v0.4.1
+-   repo: https://github.com/luizribeiro/pre-commit-mypy
+    sha: 0.5.2
     hooks:
     -   id: mypy
+        args: [--version]
