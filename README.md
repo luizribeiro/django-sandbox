@@ -2,12 +2,30 @@
 
 [![Build Status](https://travis-ci.org/luizribeiro/django-sandbox.svg?branch=master)](https://travis-ci.org/luizribeiro/django-sandbox)
 
-```sh
-$ heroku create
-$ yarn
-$ virtualenv venv
-$ source venv/bin/activate
-$ pip install -r requirements.txt
-$ python manage.py collectstatic
-$ heroku local web
+If using Heroku, do this first:
+
+```
+% heroku create
+```
+
+Then set everything up:
+
+```
+% yarn
+% virtualenv venv
+% source venv/bin/activate
+(venv) % pip install -r requirements.txt
+(venv) % python manage.py collectstatic
+```
+
+To run locally with Heroku:
+
+```
+% heroku local web
+```
+
+Or simply:
+
+```
+(venv) % env $(cat .env | xargs) gunicorn sandbox.wsgi --log-file -
 ```
