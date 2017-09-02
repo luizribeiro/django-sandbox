@@ -4,6 +4,9 @@ from os import environ as env
 import graphene
 
 
+vacuum_id = 0
+
+
 class Thermostat(graphene.ObjectType):
     mode = graphene.String()
     current_temperature = graphene.Float()
@@ -33,8 +36,10 @@ class Query(graphene.ObjectType):
         )
 
     def resolve_vacuum(self, info):
-        alfred = Alfred(env.get('MIROBO_IP'), env.get('MIROBO_TOKEN'))
+        global vacuum_id
+        alfred = Alfred(env.get('MIROBO_IP'), env.get('MIROBO_TOKEN'), vacuum_id)
         status = alfred.status()
+        vacuum_id = alfred.raw_id
         return Vacuum(
             battery=status.battery,
             state=status.state,
