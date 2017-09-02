@@ -13,9 +13,22 @@ class Thermostat(graphene.ObjectType):
     target_temperature = graphene.Float()
 
 
+class VacuumState(graphene.Enum):
+    CHARGER_DISCONNECTED = 2
+    IDLE = 3
+    CLEANING = 5
+    RETURNING_HOME = 6
+    MANUAL_MODE = 7
+    CHARGING = 8
+    PAUSED = 10
+    SPOT_CLEANING = 11
+    ERROR = 12
+    UPDATING = 14
+
+
 class Vacuum(graphene.ObjectType):
-    battery = graphene.String()
-    state = graphene.String()
+    battery = graphene.Int()
+    state = graphene.Field(VacuumState)
 
 
 class Query(graphene.ObjectType):
@@ -42,7 +55,7 @@ class Query(graphene.ObjectType):
         vacuum_id = alfred.raw_id
         return Vacuum(
             battery=status.battery,
-            state=status.state,
+            state=status.state_code,
         )
 
 
