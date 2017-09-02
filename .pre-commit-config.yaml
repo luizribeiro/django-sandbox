@@ -6,4 +6,4 @@
     sha: 0.5.2
     hooks:
     -   id: mypy
-        args: [--version]
+        args: []

@@ -1,6 +1,7 @@
 from mirobo import Vacuum as Alfred
 from nest import Nest
 from os import environ as env
+from graphql.execution.base import ResolveInfo
 import graphene
 
 
@@ -43,7 +44,7 @@ class Query(graphene.ObjectType):
     thermostat = graphene.Field(Thermostat, description='Nest Thermostat')
     vacuum = graphene.Field(Vacuum, description='Nest Thermostat')
 
-    def resolve_thermostat(self, info):
+    def resolve_thermostat(self, info: ResolveInfo) -> Thermostat:
         nest = Nest(
             client_id=env.get('NEST_CLIENT_ID'),
             client_secret=env.get('NEST_CLIENT_SECRET'),
@@ -56,7 +57,7 @@ class Query(graphene.ObjectType):
             target_temperature=thermostat.target,
         )
 
-    def resolve_vacuum(self, info):
+    def resolve_vacuum(self, info: ResolveInfo) -> Vacuum:
         global vacuum_id
         alfred = Alfred(env.get('MIROBO_IP'), env.get('MIROBO_TOKEN'), vacuum_id)
         status = alfred.status()
