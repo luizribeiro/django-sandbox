@@ -25,8 +25,13 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'hello'
+    'hello',
+    'graphene_django',
 )
+
+GRAPHENE = {
+    'SCHEMA': 'hello.schema.schema',
+}
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',

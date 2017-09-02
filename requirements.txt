@@ -2,3 +2,4 @@ Django==1.11.1
 gunicorn==19.7.1
 whitenoise==3.3.0
 python-nest==3.3.0
+graphene-django>=2.0.dev
