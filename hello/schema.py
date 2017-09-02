@@ -7,8 +7,16 @@ import graphene
 vacuum_id = 0
 
 
+class ThermostatMode(graphene.Enum):
+    OFF = 'off'
+    ECO = 'eco'
+    COOL = 'cool'
+    HEAT = 'heat'
+    HEAT_COOL = 'heat-cool'
+
+
 class Thermostat(graphene.ObjectType):
-    mode = graphene.String()
+    mode = graphene.Field(ThermostatMode)
     current_temperature = graphene.Float()
     target_temperature = graphene.Float()
 
