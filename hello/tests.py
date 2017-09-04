@@ -20,8 +20,16 @@ class HelloTest(TestCase):
                 ),
             ],
         )
+        vacuum_mock = MagicMock(
+            status=MagicMock(return_value=MagicMock(
+                state_code=8,
+                battery=90,
+            )),
+            raw_id=42,
+        )
 
-        with patch('hello.schema.Nest', return_value=nest_mock):
+        with patch('hello.schema.Nest', return_value=nest_mock), \
+                patch('hello.schema.Alfred', return_value=vacuum_mock):
             response = Client().get(
                 '/graphql/',
                 {'query': '{thermostat{mode},vacuum{state}}'},
