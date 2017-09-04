@@ -44,7 +44,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
 )
 
-ROOT_URLCONF = 'sandbox.urls'
+ROOT_URLCONF = 'conf.urls'
 
 TEMPLATES = [
     {
@@ -63,7 +63,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'sandbox.wsgi.application'
+WSGI_APPLICATION = 'conf.wsgi.application'
 
 
 # Database

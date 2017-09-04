@@ -27,5 +27,5 @@ To run locally with Heroku:
 Or simply:
 
 ```
-(venv) % env $(cat .env | xargs) gunicorn sandbox.wsgi --log-file -
+(venv) % env $(cat .env | xargs) gunicorn conf.wsgi --log-file -
 ```
