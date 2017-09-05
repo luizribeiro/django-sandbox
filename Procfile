@@ -1,2 +1,2 @@
 wsgi: conf.wsgi:application
-worker: python3 worker.py
+worker: ./manage.py vacuum_worker
