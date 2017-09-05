@@ -4,3 +4,4 @@ whitenoise==3.3.0
 python-nest==3.3.0
 python-mirobo==0.1.4
 graphene-django>=2.0.dev
+django-keyvaluestore==0.3

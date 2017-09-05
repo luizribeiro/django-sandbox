@@ -2,7 +2,9 @@ from django.test import (
     Client,
     TestCase,
 )
+from keyvaluestore.utils import get_value_or_default
 import json
+from os import environ as env
 from unittest.mock import (
     patch,
     MagicMock,
@@ -10,6 +12,21 @@ from unittest.mock import (
 
 
 class HelloTest(TestCase):
+    def test_vacuum_seq_id(self) -> None:
+        current_seq_id = int(get_value_or_default('vacuum_seq', '0'))
+        vacuum_mock = MagicMock(
+            status=MagicMock(return_value=MagicMock(state_code=8, battery=90)),
+            raw_id=93,
+        )
+        with patch('hello.schema.Alfred', return_value=vacuum_mock) as alfred:
+            Client().get('/graphql/', {'query': '{vacuum{state}}'})
+            alfred.assert_called_once_with(
+                env.get('MIROBO_IP'),
+                env.get('MIROBO_TOKEN'),
+                current_seq_id,
+            )
+        assert get_value_or_default('vacuum_seq', '0') == '93'
+
     def test_graphql_response(self) -> None:
         nest_mock = MagicMock(
             thermostats=[

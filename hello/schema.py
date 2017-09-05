@@ -1,11 +1,9 @@
+from graphql.execution.base import ResolveInfo
+from keyvaluestore.utils import get_value_or_default, set_key_value
 from mirobo import Vacuum as Alfred
 from nest import Nest
 from os import environ as env
-from graphql.execution.base import ResolveInfo
 import graphene
-
-
-vacuum_id = 0
 
 
 class ThermostatMode(graphene.Enum):
@@ -58,10 +56,10 @@ class Query(graphene.ObjectType):
         )
 
     def resolve_vacuum(self, info: ResolveInfo) -> Vacuum:
-        global vacuum_id
-        alfred = Alfred(env.get('MIROBO_IP'), env.get('MIROBO_TOKEN'), vacuum_id)
+        seq_id = int(get_value_or_default('vacuum_seq', '0'))
+        alfred = Alfred(env.get('MIROBO_IP'), env.get('MIROBO_TOKEN'), seq_id)
         status = alfred.status()
-        vacuum_id = alfred.raw_id
+        set_key_value('vacuum_seq', str(alfred.raw_id))
         return Vacuum(
             battery=status.battery,
             state=status.state_code,
