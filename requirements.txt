@@ -1,7 +1,7 @@
-Django==1.11.1
+Django==1.11.4
 gunicorn==19.7.1
 whitenoise==3.3.0
 python-nest==3.3.0
 python-mirobo==0.1.4
 graphene-django>=2.0.dev
-django-keyvaluestore==0.3
+-e git://github.com/luizribeiro/django-keyvaluestore.git#egg=django-keyvaluestore

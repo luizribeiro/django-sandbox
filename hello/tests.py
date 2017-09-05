@@ -26,6 +26,21 @@ class HelloTest(TestCase):
                 current_seq_id,
             )
         assert get_value_or_default('vacuum_seq', '0') == '93'
+        vacuum_mock = MagicMock(
+            status=MagicMock(return_value=MagicMock(state_code=8, battery=90)),
+            raw_id=94,
+        )
+        with patch('hello.schema.Alfred', return_value=vacuum_mock) as alfred:
+            response = Client().get('/graphql/', {'query': '{vacuum{state}}'})
+            alfred.assert_called_once_with(
+                env.get('MIROBO_IP'),
+                env.get('MIROBO_TOKEN'),
+                93,
+            )
+        assert get_value_or_default('vacuum_seq', '0') == '94'
+        assert json.loads(response.content.decode('utf-8')) == {'data': {
+            'vacuum': {'state': 'CHARGING'},
+        }}
 
     def test_graphql_response(self) -> None:
         nest_mock = MagicMock(
