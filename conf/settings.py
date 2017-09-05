@@ -9,8 +9,10 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
-SECRET_KEY = os.environ['DJANGO_SESSION_KEY'] or \
-        'W9fz$oW9?|mK,_-JPeuW}_]$q-G>Ma!gfBISzN7zB1@Cw'
+SECRET_KEY = os.environ.get(
+    'DJANGO_SESSION_KEY',
+    'W9fz$oW9?|mK,_-JPeuW}_]$q-G>Ma!gfBISzN7zB1@Cw',
+)
 
 DEBUG = False
 
