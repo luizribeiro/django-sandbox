@@ -11,14 +11,14 @@ from unittest.mock import (
 )
 
 
-class HelloTest(TestCase):
+class VacuumTests(TestCase):
     def test_vacuum_seq_id(self) -> None:
         current_seq_id = int(get_value_or_default('vacuum_seq', '0'))
         vacuum_mock = MagicMock(
             status=MagicMock(return_value=MagicMock(state_code=8, battery=90)),
             raw_id=93,
         )
-        with patch('hello.schema.Alfred', return_value=vacuum_mock) as alfred:
+        with patch('backend.schema.Alfred', return_value=vacuum_mock) as alfred:
             Client().get('/graphql/', {'query': '{vacuum{state}}'})
             alfred.assert_called_once_with(
                 env.get('MIROBO_IP'),
@@ -30,7 +30,7 @@ class HelloTest(TestCase):
             status=MagicMock(return_value=MagicMock(state_code=8, battery=90)),
             raw_id=94,
         )
-        with patch('hello.schema.Alfred', return_value=vacuum_mock) as alfred:
+        with patch('backend.schema.Alfred', return_value=vacuum_mock) as alfred:
             response = Client().get('/graphql/', {'query': '{vacuum{state}}'})
             alfred.assert_called_once_with(
                 env.get('MIROBO_IP'),
@@ -42,6 +42,8 @@ class HelloTest(TestCase):
             'vacuum': {'state': 'CHARGING'},
         }}
 
+
+class GraphQLTests(TestCase):
     def test_graphql_response(self) -> None:
         nest_mock = MagicMock(
             thermostats=[
@@ -60,8 +62,8 @@ class HelloTest(TestCase):
             raw_id=42,
         )
 
-        with patch('hello.schema.Nest', return_value=nest_mock), \
-                patch('hello.schema.Alfred', return_value=vacuum_mock):
+        with patch('backend.schema.Nest', return_value=nest_mock), \
+                patch('backend.schema.Alfred', return_value=vacuum_mock):
             response = Client().get(
                 '/graphql/',
                 {'query': '{thermostat{mode},vacuum{state}}'},

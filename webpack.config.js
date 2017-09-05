@@ -1,21 +1,21 @@
-var baseDir = __dirname + '/hello/static/js';
+var baseDir = __dirname + "/backend/static/js";
 
 module.exports = {
-  context: baseDir + '/src',
+  context: baseDir + "/src",
   entry: {
-    main: './main.js'
+    main: "./main.js"
   },
   output: {
-    path: baseDir + '/dist',
-    filename: '[name].js'
+    path: baseDir + "/dist",
+    filename: "[name].js"
   },
   module: {
     loaders: [
       {
         test: /\.js$/,
-        loader: 'babel-loader',
+        loader: "babel-loader",
         query: {
-          presets: ['es2015', 'react', 'flow']
+          presets: ["es2015", "react", "flow"]
         }
       }
     ]

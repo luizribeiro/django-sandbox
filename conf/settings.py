@@ -27,12 +27,12 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'keyvaluestore',
-    'hello',
+    'backend',
     'graphene_django',
 )
 
 GRAPHENE = {
-    'SCHEMA': 'hello.schema.schema',
+    'SCHEMA': 'backend.schema.schema',
 }
 
 MIDDLEWARE_CLASSES = (
