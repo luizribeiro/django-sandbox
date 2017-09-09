@@ -35,8 +35,9 @@ class VacuumState(graphene.Enum):
 
 class Vacuum(graphene.ObjectType):
     battery = graphene.Int()
-    state = graphene.Field(VacuumState)
     cleaned_area = graphene.Float()
+    fan_speed = graphene.Int()
+    state = graphene.Field(VacuumState)
 
 
 class Query(graphene.ObjectType):
@@ -63,8 +64,9 @@ class Query(graphene.ObjectType):
         set_key_value('vacuum_seq', str(alfred.raw_id))
         return Vacuum(
             battery=status.battery,
-            state=status.state_code,
             cleaned_area=status.clean_area,
+            fan_speed=status.fanspeed,
+            state=status.state_code,
         )
 
 
