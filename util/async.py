@@ -13,9 +13,9 @@ def threaded_async(fn):
 
 
 def middleware(view):
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
     def middleware(*args, **kwargs):
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         return view(*args, **kwargs)
     return middleware
 
