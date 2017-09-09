@@ -36,7 +36,7 @@ class VacuumState(graphene.Enum):
 class Vacuum(graphene.ObjectType):
     battery = graphene.Int()
     state = graphene.Field(VacuumState)
-    cleaned_area = graphene.String()
+    cleaned_area = graphene.Float()
 
 
 class Query(graphene.ObjectType):
