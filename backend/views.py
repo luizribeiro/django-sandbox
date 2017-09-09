@@ -3,8 +3,12 @@ from django.http import (
     HttpResponse,
 )
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
+from graphene_django.views import GraphQLView
+from graphql.execution.executors.asyncio import AsyncioExecutor
 from nest import Nest
 from os import environ as env
+import asyncio
 
 
 def nest(request: HttpRequest) -> HttpResponse:
@@ -23,4 +27,21 @@ def nest(request: HttpRequest) -> HttpResponse:
 
 def react(request: HttpRequest) -> HttpResponse:
     return render(request, 'index.html')
+
+
+@csrf_exempt
+def graphql(request: HttpRequest) -> HttpResponse:
+    view = GraphQLView.as_view(
+        graphiql=False,
+        executor=AsyncioExecutor(loop=asyncio.get_event_loop()),
+    )
+    return view(request)
+
+
+def graphiql(request: HttpRequest) -> HttpResponse:
+    view = GraphQLView.as_view(
+        graphiql=True,
+        executor=AsyncioExecutor(loop=asyncio.get_event_loop()),
+    )
+    return view(request)
 
