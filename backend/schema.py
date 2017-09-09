@@ -3,6 +3,7 @@ from keyvaluestore.utils import get_value_or_default, set_key_value
 from mirobo import Vacuum as Alfred
 from nest import Nest
 from os import environ as env
+from util.async import threaded_async
 import graphene
 
 
@@ -44,7 +45,8 @@ class Query(graphene.ObjectType):
     thermostat = graphene.Field(Thermostat, description='Nest Thermostat')
     vacuum = graphene.Field(Vacuum, description='Nest Thermostat')
 
-    async def resolve_thermostat(self, info: ResolveInfo) -> Thermostat:
+    @threaded_async
+    def resolve_thermostat(self, info: ResolveInfo) -> Thermostat:
         nest = Nest(
             client_id=env.get('NEST_CLIENT_ID'),
             client_secret=env.get('NEST_CLIENT_SECRET'),
@@ -57,7 +59,8 @@ class Query(graphene.ObjectType):
             target_temperature=thermostat.target,
         )
 
-    async def resolve_vacuum(self, info: ResolveInfo) -> Vacuum:
+    @threaded_async
+    def resolve_vacuum(self, info: ResolveInfo) -> Vacuum:
         seq_id = int(get_value_or_default('vacuum_seq', '0'))
         alfred = Alfred(env.get('MIROBO_IP'), env.get('MIROBO_TOKEN'), seq_id)
         status = alfred.status()
