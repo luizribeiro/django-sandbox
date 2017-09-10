@@ -18,9 +18,9 @@ class VacuumTests(TestCase):
             status=MagicMock(return_value=MagicMock(state_code=8, battery=90)),
             raw_id=93,
         )
-        with patch('backend.schema.Alfred', return_value=vacuum_mock) as alfred:
+        with patch('backend.vacuum.mirobo.Vacuum', return_value=vacuum_mock) as vacuum:
             Client().get('/graphql/', {'query': '{vacuum{state}}'})
-            alfred.assert_called_once_with(
+            vacuum.assert_called_once_with(
                 env.get('MIROBO_IP'),
                 env.get('MIROBO_TOKEN'),
                 current_seq_id,
@@ -30,9 +30,9 @@ class VacuumTests(TestCase):
             status=MagicMock(return_value=MagicMock(state_code=8, battery=90)),
             raw_id=94,
         )
-        with patch('backend.schema.Alfred', return_value=vacuum_mock) as alfred:
+        with patch('backend.vacuum.mirobo.Vacuum', return_value=vacuum_mock) as vacuum:
             response = Client().get('/graphql/', {'query': '{vacuum{state}}'})
-            alfred.assert_called_once_with(
+            vacuum.assert_called_once_with(
                 env.get('MIROBO_IP'),
                 env.get('MIROBO_TOKEN'),
                 93,
@@ -63,7 +63,7 @@ class GraphQLTests(TestCase):
         )
 
         with patch('backend.schema.Nest', return_value=nest_mock), \
-                patch('backend.schema.Alfred', return_value=vacuum_mock):
+                patch('backend.vacuum.mirobo.Vacuum', return_value=vacuum_mock):
             response = Client().get(
                 '/graphql/',
                 {'query': '{thermostat{mode},vacuum{state}}'},
@@ -81,7 +81,7 @@ class GraphQLTests(TestCase):
             raw_id=42,
         )
 
-        with patch('backend.schema.Alfred', return_value=vacuum_mock):
+        with patch('backend.vacuum.mirobo.Vacuum', return_value=vacuum_mock):
             response = Client(enforce_csrf_checks=True).post(
                 '/graphql/',
                 {'query': '{vacuum{state}}'},
