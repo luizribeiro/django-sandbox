@@ -75,3 +75,20 @@ class GraphQLTests(TestCase):
                 },
             }
 
+    def test_graphql_query_with_post_without_csrf(self) -> None:
+        vacuum_mock = MagicMock(
+            status=MagicMock(return_value=MagicMock(state_code=8, battery=90)),
+            raw_id=42,
+        )
+
+        with patch('backend.schema.Alfred', return_value=vacuum_mock):
+            response = Client(enforce_csrf_checks=True).post(
+                '/graphql/',
+                {'query': '{vacuum{state}}'},
+            )
+            assert json.loads(response.content.decode('utf-8')) == {
+                'data': {
+                    'vacuum': {'state': 'CHARGING'},
+                },
+            }
+
