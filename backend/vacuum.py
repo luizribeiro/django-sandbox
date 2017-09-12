@@ -42,24 +42,21 @@ class VacuumError(Enum):
 
 
 class Vacuum:
-    @threaded_async
-    def async_read_status(self) -> mirobo.VacuumStatus:
-        v = mirobo.Vacuum(
+    def __init__(self) -> None:
+        self._vacuum = mirobo.Vacuum(
             environ.get('MIROBO_IP'),
             environ.get('MIROBO_TOKEN'),
             int(get_value_or_default('vacuum_seq', '0')),
         )
-        status = v.status()
-        set_key_value('vacuum_seq', str(v.raw_id))
+
+    @threaded_async
+    def async_read_status(self) -> mirobo.VacuumStatus:
+        status = self._vacuum.status()
+        set_key_value('vacuum_seq', str(self._vacuum.raw_id))
         return status
 
     @threaded_async
     def async_start(self) -> None:
-        v = mirobo.Vacuum(
-            environ.get('MIROBO_IP'),
-            environ.get('MIROBO_TOKEN'),
-            int(get_value_or_default('vacuum_seq', '0')),
-        )
-        v.start()
-        set_key_value('vacuum_seq', str(v.raw_id))
+        self._vacuum.start()
+        set_key_value('vacuum_seq', str(self._vacuum.raw_id))
 

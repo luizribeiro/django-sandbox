@@ -1,6 +1,6 @@
 from django.test import (
     Client,
-    TestCase,
+    TransactionTestCase,
 )
 from keyvaluestore.utils import get_value_or_default
 import json
@@ -11,7 +11,7 @@ from unittest.mock import (
 )
 
 
-class VacuumTests(TestCase):
+class VacuumTests(TransactionTestCase):
     def test_vacuum_seq_id(self) -> None:
         current_seq_id = int(get_value_or_default('vacuum_seq', '0'))
         vacuum_mock = MagicMock(
@@ -43,7 +43,7 @@ class VacuumTests(TestCase):
         }}
 
 
-class GraphQLTests(TestCase):
+class GraphQLTests(TransactionTestCase):
     def test_graphql_response(self) -> None:
         nest_mock = MagicMock(
             thermostats=[
