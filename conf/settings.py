@@ -27,6 +27,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'keyvaluestore',
+    'django_apscheduler',
     'backend',
     'graphene_django',
 )
