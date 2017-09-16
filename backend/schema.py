@@ -32,7 +32,7 @@ class Vacuum(graphene.ObjectType):
 
 class Query(graphene.ObjectType):
     thermostat = graphene.Field(Thermostat, description='Nest Thermostat')
-    vacuum = graphene.Field(Vacuum, description='Nest Thermostat')
+    vacuum = graphene.Field(Vacuum, description='Xiaomi Mi Robot Vacuum')
 
     @threaded_async
     def resolve_thermostat(self, info: ResolveInfo) -> Thermostat:
