@@ -62,7 +62,7 @@ class GraphQLTests(TransactionTestCase):
             raw_id=42,
         )
 
-        with patch('backend.schema.Nest', return_value=nest_mock), \
+        with patch('home.queries.Nest', return_value=nest_mock), \
                 patch('home.vacuum.mirobo.Vacuum', return_value=vacuum_mock):
             response = Client().get(
                 '/graphql/',
