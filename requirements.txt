@@ -5,4 +5,6 @@ python-nest==3.4.0
 python-mirobo==0.2.0
 graphene-django>=2.0.dev
 django-apscheduler==0.2.1
+djangorestframework==3.6.4
+django-rest-auth[with_social]==0.9.1
 -e git://github.com/luizribeiro/django-keyvaluestore.git#egg=django-keyvaluestore

@@ -20,18 +20,41 @@ DEBUG = False
 # Application definition
 
 INSTALLED_APPS = (
+    # basic django
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.sites',
     'django.contrib.staticfiles',
+
+    # rest
+    'rest_framework',
+    'rest_framework.authtoken',
+
+    # facebook auth
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.facebook',
+    'rest_auth',
+    'rest_auth.registration',
+
+    # GraphQL
+    'graphene_django',
+
+    # other dependencies
     'keyvaluestore',
     'django_apscheduler',
+
+    # my own apps
     'backend',
     'home',
-    'graphene_django',
+
 )
+
+SITE_ID = 1
 
 GRAPHENE = {
     'SCHEMA': 'backend.schema.schema',
