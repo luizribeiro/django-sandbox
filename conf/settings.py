@@ -14,7 +14,7 @@ SECRET_KEY = os.environ.get(
     'W9fz$oW9?|mK,_-JPeuW}_]$q-G>Ma!gfBISzN7zB1@Cw',
 )
 
-DEBUG = True
+DEBUG = False
 
 
 # Application definition
