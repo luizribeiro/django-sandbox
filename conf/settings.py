@@ -29,6 +29,7 @@ INSTALLED_APPS = (
     'keyvaluestore',
     'django_apscheduler',
     'backend',
+    'home',
     'graphene_django',
 )
 
