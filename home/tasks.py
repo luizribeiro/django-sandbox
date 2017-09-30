@@ -2,7 +2,7 @@ import datetime
 import sys
 
 from backend import scheduler
-from backend.vacuum import (
+from home.vacuum import (
     Vacuum,
     VacuumError,
     VacuumState,

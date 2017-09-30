@@ -1,4 +1,4 @@
-from backend.vacuum import (
+from home.vacuum import (
     Vacuum as VacuumClient,
     VacuumState,
 )
