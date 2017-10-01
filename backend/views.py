@@ -16,6 +16,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.settings import api_settings
 
 import asyncio
+import json
 
 
 class FacebookLogin(SocialLoginView):
@@ -30,7 +31,7 @@ def graphql(request: HttpRequest) -> HttpResponse:
         graphiql=False,
         executor=AsyncioExecutor(loop=asyncio.get_event_loop()),
     )
-    request.body = request.data
+    request.body = json.dumps(request.data)
     return view(request)
 
 
