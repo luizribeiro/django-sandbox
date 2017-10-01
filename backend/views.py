@@ -1,4 +1,5 @@
 from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+from django.contrib.admin.views.decorators import staff_member_required
 from django.http import (
     HttpRequest,
     HttpResponse,
@@ -23,6 +24,7 @@ def graphql(request: HttpRequest) -> HttpResponse:
     return view(request)
 
 
+@staff_member_required
 def graphiql(request: HttpRequest) -> HttpResponse:
     view = GraphQLView.as_view(
         graphiql=True,
