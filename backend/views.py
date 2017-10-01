@@ -31,7 +31,7 @@ def graphql(request: HttpRequest) -> HttpResponse:
         graphiql=False,
         executor=AsyncioExecutor(loop=asyncio.get_event_loop()),
     )
-    request.body = json.dumps(request.data)
+    request.body = json.loads(request.data)
     return view(request)
 
 
