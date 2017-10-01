@@ -16,22 +16,28 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.settings import api_settings
 
 import asyncio
-import json
+import rest_framework
 
 
 class FacebookLogin(SocialLoginView):
     adapter_class = FacebookOAuth2Adapter
 
 
+class RestGraphQLView(GraphQLView):
+    def parse_body(self, request):
+        if type(request) is rest_framework.request.Request:
+            return request.data
+        return super().parse_body(request)
+
+
 @api_view(['GET', 'POST'])
 @authentication_classes(api_settings.DEFAULT_AUTHENTICATION_CLASSES)
 @permission_classes((IsAuthenticated,))
 def graphql(request: HttpRequest) -> HttpResponse:
-    view = GraphQLView.as_view(
+    view = RestGraphQLView.as_view(
         graphiql=False,
         executor=AsyncioExecutor(loop=asyncio.get_event_loop()),
     )
-    request.body = json.loads(request.data)
     return view(request)
 
 
