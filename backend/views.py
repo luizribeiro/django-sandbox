@@ -30,7 +30,8 @@ def graphql(request: HttpRequest) -> HttpResponse:
         graphiql=False,
         executor=AsyncioExecutor(loop=asyncio.get_event_loop()),
     )
-    return view(request.data)
+    request.body = request.data
+    return view(request)
 
 
 @staff_member_required
