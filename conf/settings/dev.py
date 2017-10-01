@@ -1,4 +1,5 @@
 from conf.settings.common import *
 
-DEBUG = True
+# @threaded_async (or the asyncio loop) is giving trouble in debug mode :/
+DEBUG = False
 

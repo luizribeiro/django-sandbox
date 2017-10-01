@@ -4,10 +4,17 @@ from django.http import (
     HttpRequest,
     HttpResponse,
 )
-from django.views.decorators.csrf import csrf_exempt
 from graphene_django.views import GraphQLView
 from graphql.execution.executors.asyncio import AsyncioExecutor
 from rest_auth.registration.views import SocialLoginView
+from rest_framework.decorators import (
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.settings import api_settings
+
 import asyncio
 
 
@@ -15,7 +22,9 @@ class FacebookLogin(SocialLoginView):
     adapter_class = FacebookOAuth2Adapter
 
 
-@csrf_exempt
+@api_view(['GET', 'POST'])
+@authentication_classes(api_settings.DEFAULT_AUTHENTICATION_CLASSES)
+@permission_classes((IsAuthenticated,))
 def graphql(request: HttpRequest) -> HttpResponse:
     view = GraphQLView.as_view(
         graphiql=False,

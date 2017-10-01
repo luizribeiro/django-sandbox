@@ -1,10 +1,9 @@
-from django.test import (
-    Client,
-    TransactionTestCase,
-)
+from django.contrib.auth.models import User
+from django.test import TransactionTestCase
 from keyvaluestore.utils import get_value_or_default
 import json
 from os import environ as env
+from rest_framework.test import APIClient
 from unittest.mock import (
     patch,
     MagicMock,
@@ -12,6 +11,13 @@ from unittest.mock import (
 
 
 class VacuumTests(TransactionTestCase):
+    def setUp(self) -> None:
+        self.user = User.objects.create_user(
+            username='luiz',
+            email='luiz@sb.luiz.ninja',
+            password='top_secret',
+        )
+
     def test_vacuum_seq_id(self) -> None:
         current_seq_id = int(get_value_or_default('vacuum_seq', '0'))
         vacuum_mock = MagicMock(
@@ -19,7 +25,9 @@ class VacuumTests(TransactionTestCase):
             raw_id=93,
         )
         with patch('home.vacuum.mirobo.Vacuum', return_value=vacuum_mock) as vacuum:
-            Client().get('/graphql/', {'query': '{vacuum{state}}'})
+            client = APIClient()
+            client.force_authenticate(user=self.user)
+            response = client.get('/graphql/', {'query': '{vacuum{state}}'})
             vacuum.assert_called_once_with(
                 env.get('MIROBO_IP'),
                 env.get('MIROBO_TOKEN'),
@@ -31,7 +39,9 @@ class VacuumTests(TransactionTestCase):
             raw_id=94,
         )
         with patch('home.vacuum.mirobo.Vacuum', return_value=vacuum_mock) as vacuum:
-            response = Client().get('/graphql/', {'query': '{vacuum{state}}'})
+            client = APIClient()
+            client.force_authenticate(user=self.user)
+            response = client.get('/graphql/', {'query': '{vacuum{state}}'})
             vacuum.assert_called_once_with(
                 env.get('MIROBO_IP'),
                 env.get('MIROBO_TOKEN'),
@@ -44,6 +54,13 @@ class VacuumTests(TransactionTestCase):
 
 
 class GraphQLTests(TransactionTestCase):
+    def setUp(self) -> None:
+        self.user = User.objects.create_user(
+            username='luiz',
+            email='luiz@sb.luiz.ninja',
+            password='top_secret',
+        )
+
     def test_graphql_response(self) -> None:
         nest_mock = MagicMock(
             thermostats=[
@@ -64,7 +81,9 @@ class GraphQLTests(TransactionTestCase):
 
         with patch('home.queries.Nest', return_value=nest_mock), \
                 patch('home.vacuum.mirobo.Vacuum', return_value=vacuum_mock):
-            response = Client().get(
+            client = APIClient()
+            client.force_authenticate(user=self.user)
+            response = client.get(
                 '/graphql/',
                 {'query': '{thermostat{mode},vacuum{state}}'},
             )
@@ -82,7 +101,9 @@ class GraphQLTests(TransactionTestCase):
         )
 
         with patch('home.vacuum.mirobo.Vacuum', return_value=vacuum_mock):
-            response = Client(enforce_csrf_checks=True).post(
+            client = APIClient(enforce_csrf_checks=True)
+            client.force_authenticate(user=self.user)
+            response = client.post(
                 '/graphql/',
                 {'query': '{vacuum{state}}'},
             )
@@ -90,5 +111,21 @@ class GraphQLTests(TransactionTestCase):
                 'data': {
                     'vacuum': {'state': 'CHARGING'},
                 },
+            }
+
+    def test_unauthenticated_graphql_query(self) -> None:
+        vacuum_mock = MagicMock(
+            status=MagicMock(return_value=MagicMock(state_code=8, battery=90)),
+            raw_id=42,
+        )
+
+        with patch('home.vacuum.mirobo.Vacuum', return_value=vacuum_mock):
+            client = APIClient()
+            response = client.get(
+                '/graphql/',
+                {'query': '{vacuum{state}}'},
+            )
+            assert json.loads(response.content.decode('utf-8')) == {
+                'detail': 'Authentication credentials were not provided.',
             }
 
