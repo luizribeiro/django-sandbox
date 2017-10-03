@@ -67,4 +67,5 @@ class Vacuum:
             self._vacuum.pause()
         elif state == VacuumState.CHARGING.value:
             self._vacuum.home()
+        set_key_value('vacuum_seq', str(self._vacuum.raw_id))
 

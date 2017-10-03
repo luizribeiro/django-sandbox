@@ -162,4 +162,5 @@ class GraphQLMutationTests(TransactionTestCase):
                     'updateVacuum': {'ok': True},
                 },
             }
+        assert get_value_or_default('vacuum_seq', '0') == '42'
 
