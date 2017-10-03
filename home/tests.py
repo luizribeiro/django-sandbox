@@ -53,7 +53,7 @@ class VacuumTests(TransactionTestCase):
         }}
 
 
-class GraphQLTests(TransactionTestCase):
+class GraphQLQueryTests(TransactionTestCase):
     def setUp(self) -> None:
         self.user = User.objects.create_user(
             username='luiz',
@@ -127,5 +127,39 @@ class GraphQLTests(TransactionTestCase):
             )
             assert json.loads(response.content.decode('utf-8')) == {
                 'detail': 'Authentication credentials were not provided.',
+            }
+
+
+class GraphQLMutationTests(TransactionTestCase):
+    def setUp(self) -> None:
+        self.user = User.objects.create_user(
+            username='luiz',
+            email='luiz@sb.luiz.ninja',
+            password='top_secret',
+        )
+
+    def test_graphql_mutation(self) -> None:
+        start_mock = MagicMock()
+        vacuum_mock = MagicMock(
+            status=MagicMock(return_value=MagicMock(
+                state_code=8,
+                battery=90,
+            )),
+            raw_id=42,
+            start=start_mock,
+        )
+
+        with patch('home.vacuum.mirobo.Vacuum', return_value=vacuum_mock):
+            client = APIClient()
+            client.force_authenticate(user=self.user)
+            response = client.post(
+                '/graphql/',
+                {'query': 'mutation {updateVacuum(state: CLEANING) {ok}}'},
+            )
+            self.assertTrue(start_mock.called)
+            assert json.loads(response.content.decode('utf-8')) == {
+                'data': {
+                    'updateVacuum': {'ok': True},
+                },
             }
 

@@ -17,5 +17,19 @@ def _build_query() -> graphene.ObjectType:
     return type('Query', tuple(bases), {})
 
 
-schema = graphene.Schema(query=_build_query())
+def _build_mutation() -> graphene.ObjectType:
+    bases = []
+    for app in settings.INSTALLED_APPS:
+        try:
+            mutations = import_module('.mutations', app)
+            bases.append(mutations.Mutation)  # type: ignore
+        except ImportError:
+            pass
+        except AttributeError:
+            pass
+    bases.append(graphene.ObjectType)
+    return type('Mutation', tuple(bases), {})
+
+
+schema = graphene.Schema(query=_build_query(), mutation=_build_mutation())
 

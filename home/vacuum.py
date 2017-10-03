@@ -60,3 +60,11 @@ class Vacuum:
         self._vacuum.start()
         set_key_value('vacuum_seq', str(self._vacuum.raw_id))
 
+    def set_state(self, state: VacuumState) -> None:
+        if state == VacuumState.CLEANING.value:
+            self._vacuum.start()
+        elif state == VacuumState.PAUSED.value:
+            self._vacuum.pause()
+        elif state == VacuumState.CHARGING.value:
+            self._vacuum.home()
+

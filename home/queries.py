@@ -2,10 +2,8 @@ from graphql.execution.base import ResolveInfo
 from os import environ as env
 import graphene
 
-from home.vacuum import (
-    Vacuum as VacuumClient,
-    VacuumState,
-)
+from home.graphql_common import VacuumState
+from home.vacuum import Vacuum as VacuumClient
 from nest import Nest
 from util.async import threaded_async
 
@@ -28,7 +26,7 @@ class Vacuum(graphene.ObjectType):
     battery = graphene.Int()
     cleaned_area = graphene.Float()
     fan_speed = graphene.Int()
-    state = graphene.Field(graphene.Enum.from_enum(VacuumState))
+    state = graphene.Field(VacuumState)
 
 
 class Query(graphene.ObjectType):
