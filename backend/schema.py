@@ -11,8 +11,6 @@ def _build_query() -> graphene.ObjectType:
             bases.append(queries.Query)  # type: ignore
         except ImportError:
             pass
-        except AttributeError:
-            pass
     bases.append(graphene.ObjectType)
     return type('Query', tuple(bases), {})
 
@@ -24,8 +22,6 @@ def _build_mutation() -> graphene.ObjectType:
             mutations = import_module('.mutations', app)
             bases.append(mutations.Mutation)  # type: ignore
         except ImportError:
-            pass
-        except AttributeError:
             pass
     bases.append(graphene.ObjectType)
     return type('Mutation', tuple(bases), {})
