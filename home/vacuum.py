@@ -2,7 +2,7 @@ from enum import Enum
 from keyvaluestore.utils import get_value_or_default, set_key_value
 from os import environ
 from util.async import threaded_async
-import mirobo
+import miio
 
 
 class VacuumState(Enum):
@@ -43,14 +43,14 @@ class VacuumError(Enum):
 
 class Vacuum:
     def __init__(self) -> None:
-        self._vacuum = mirobo.Vacuum(
+        self._vacuum = miio.Vacuum(
             environ.get('MIROBO_IP'),
             environ.get('MIROBO_TOKEN'),
             int(get_value_or_default('vacuum_seq', '0')),
         )
 
     @threaded_async
-    def async_read_status(self) -> mirobo.VacuumStatus:
+    def async_read_status(self) -> miio.VacuumStatus:
         status = self._vacuum.status()
         set_key_value('vacuum_seq', str(self._vacuum.raw_id))
         return status

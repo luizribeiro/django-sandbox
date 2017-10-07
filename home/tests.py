@@ -24,7 +24,7 @@ class VacuumTests(TransactionTestCase):
             status=MagicMock(return_value=MagicMock(state_code=8, battery=90)),
             raw_id=93,
         )
-        with patch('home.vacuum.mirobo.Vacuum', return_value=vacuum_mock) as vacuum:
+        with patch('home.vacuum.miio.Vacuum', return_value=vacuum_mock) as vacuum:
             client = APIClient()
             client.force_authenticate(user=self.user)
             response = client.get('/graphql/', {'query': '{vacuum{state}}'})
@@ -38,7 +38,7 @@ class VacuumTests(TransactionTestCase):
             status=MagicMock(return_value=MagicMock(state_code=8, battery=90)),
             raw_id=94,
         )
-        with patch('home.vacuum.mirobo.Vacuum', return_value=vacuum_mock) as vacuum:
+        with patch('home.vacuum.miio.Vacuum', return_value=vacuum_mock) as vacuum:
             client = APIClient()
             client.force_authenticate(user=self.user)
             response = client.get('/graphql/', {'query': '{vacuum{state}}'})
@@ -80,7 +80,7 @@ class GraphQLQueryTests(TransactionTestCase):
         )
 
         with patch('home.queries.Nest', return_value=nest_mock), \
-                patch('home.vacuum.mirobo.Vacuum', return_value=vacuum_mock):
+                patch('home.vacuum.miio.Vacuum', return_value=vacuum_mock):
             client = APIClient()
             client.force_authenticate(user=self.user)
             response = client.get(
@@ -100,7 +100,7 @@ class GraphQLQueryTests(TransactionTestCase):
             raw_id=42,
         )
 
-        with patch('home.vacuum.mirobo.Vacuum', return_value=vacuum_mock):
+        with patch('home.vacuum.miio.Vacuum', return_value=vacuum_mock):
             client = APIClient(enforce_csrf_checks=True)
             client.force_authenticate(user=self.user)
             response = client.post(
@@ -119,7 +119,7 @@ class GraphQLQueryTests(TransactionTestCase):
             raw_id=42,
         )
 
-        with patch('home.vacuum.mirobo.Vacuum', return_value=vacuum_mock):
+        with patch('home.vacuum.miio.Vacuum', return_value=vacuum_mock):
             client = APIClient()
             response = client.get(
                 '/graphql/',
@@ -149,7 +149,7 @@ class GraphQLMutationTests(TransactionTestCase):
             start=start_mock,
         )
 
-        with patch('home.vacuum.mirobo.Vacuum', return_value=vacuum_mock):
+        with patch('home.vacuum.miio.Vacuum', return_value=vacuum_mock):
             client = APIClient()
             client.force_authenticate(user=self.user)
             response = client.post(
