@@ -19,3 +19,9 @@ def middleware(view):
         return view(*args, **kwargs)
     return middleware
 
+
+def sync(fn):
+    def wrapper(*args, **kwargs):
+        return asyncio.get_event_loop().run_until_complete(fn(*args, **kwargs))
+    return wrapper
+

@@ -1,3 +1,8 @@
+import home.tasks
+from home.vacuum import (
+    VacuumError,
+    VacuumState,
+)
 from django.contrib.auth.models import User
 from django.test import TransactionTestCase
 from keyvaluestore.utils import get_value_or_default
@@ -8,6 +13,8 @@ from unittest.mock import (
     patch,
     MagicMock,
 )
+from util.async import sync
+from util.tests import captured_output
 
 
 class VacuumTests(TransactionTestCase):
@@ -163,4 +170,33 @@ class GraphQLMutationTests(TransactionTestCase):
                 },
             }
         assert get_value_or_default('vacuum_seq', '0') == '42'
+
+
+class TaskTests(TransactionTestCase):
+    @sync
+    async def test_auto_restart_vacuum(self) -> None:
+        vacuum_status_mock = MagicMock(
+            state_code=VacuumState.CHARGING,
+            error_code=VacuumError.NO_ERROR,
+            battery=90,
+        )
+        start_mock = MagicMock()
+        vacuum_mock = MagicMock(
+            status=MagicMock(return_value=vacuum_status_mock),
+            raw_id=42,
+            start=start_mock,
+        )
+
+        with patch('home.vacuum.miio.Vacuum', return_value=vacuum_mock), \
+                captured_output() as (stdout, stderr):
+            await home.tasks.check_on_vacuum()
+            self.assertFalse(start_mock.called)
+            self.assertTrue('Checking on Vacuum...' in stdout.getvalue())
+            self.assertTrue('Re-starting Vacuum...' not in stdout.getvalue())
+
+            vacuum_status_mock.state_code = VacuumState.ERROR
+            vacuum_status_mock.error_code = VacuumError.CLEAN_MAIN_BRUSH
+            await home.tasks.check_on_vacuum()
+            self.assertTrue(start_mock.called)
+            self.assertTrue('Re-starting Vacuum...' in stdout.getvalue())
 
