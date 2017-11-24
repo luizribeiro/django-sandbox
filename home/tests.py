@@ -188,15 +188,41 @@ class TaskTests(TransactionTestCase):
         )
 
         with patch('home.vacuum.miio.Vacuum', return_value=vacuum_mock), \
+                patch('home.tasks.time.time') as time_mock, \
                 captured_output() as (stdout, stderr):
+            time_mock.return_value = 1511561555.138444
+
             await home.tasks.check_on_vacuum()
             self.assertFalse(start_mock.called)
             self.assertTrue('Checking on Vacuum...' in stdout.getvalue())
             self.assertTrue('Re-starting Vacuum...' not in stdout.getvalue())
 
+            # should try restarting the vacuum if stuck on carpet
             vacuum_status_mock.state_code = VacuumState.ERROR
             vacuum_status_mock.error_code = VacuumError.CLEAN_MAIN_BRUSH
             await home.tasks.check_on_vacuum()
             self.assertTrue(start_mock.called)
             self.assertTrue('Re-starting Vacuum...' in stdout.getvalue())
+
+            # shouldn't restart sooner than 30 min
+            start_mock.reset_mock()
+            time_mock.return_value += 29 * 60
+            await home.tasks.check_on_vacuum()
+            self.assertFalse(start_mock.called)
+
+            # after 30 min is okay
+            time_mock.return_value += 1 * 60
+            await home.tasks.check_on_vacuum()
+            self.assertTrue(start_mock.called)
+
+            # shouldn't start before next day
+            start_mock.reset_mock()
+            time_mock.return_value += 23 * 60 * 60
+            await home.tasks.check_on_vacuum()
+            self.assertFalse(start_mock.called)
+
+            # next day is fine though
+            time_mock.return_value += 60 * 60
+            await home.tasks.check_on_vacuum()
+            self.assertTrue(start_mock.called)
 
