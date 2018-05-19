@@ -1,9 +1,9 @@
-Django==1.11.7
-gunicorn==19.7.1
-python-nest==3.4.0
-python-miio==0.3.2
-graphene-django>=2.0.dev
-django-apscheduler==0.2.1
-djangorestframework==3.7.3
-django-rest-auth[with_social]==0.9.2
+Django==2.0.5
+gunicorn==19.8.1
+python-nest==3.7.0
+python-miio==0.3.9
+graphene-django==2.0.0
+django-apscheduler==0.2.9
+djangorestframework==3.8.2
+django-rest-auth[with_social]==0.9.3
 -e git://github.com/luizribeiro/django-keyvaluestore.git#egg=django-keyvaluestore
