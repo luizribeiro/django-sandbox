@@ -1,8 +1,8 @@
-from django.conf.urls import url
+from django.urls import path
 
 import rosie.views
 
 urlpatterns = [
-    url(r'^rosie/', rosie.views.receive_message),
+    path('', rosie.views.receive_message),
 ]
 
