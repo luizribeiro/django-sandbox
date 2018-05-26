@@ -7,7 +7,7 @@ from os import environ as env
 
 def receive_message(request: HttpRequest) -> HttpResponse:
     if request.method == 'GET':
-        received_token = request.GET['hub.verify_token']
+        received_token = request.GET.get('hub.verify_token')
         if received_token != env.get('ROSIE_VERIFY_TOKEN'):
             return HttpResponse('Invalid verification token')
         return HttpResponse(request.GET['hub.challenge'])
