@@ -18,5 +18,7 @@ urlpatterns = [
     url(r'^api/auth/facebook/$', backend.views.FacebookLogin.as_view(), name='fb_login'),
 
     url(r'^admin/', admin.site.urls),
+
+    url(r'^rosie/', include('rosie.urls')),
 ]
 
