@@ -22,7 +22,9 @@ def _handle_received_message(
             "recipient": json.dumps({
                 "id": str(sender_psid),
             }),
-            "message": "Received: " + text,
+            "message": json.dumps({
+                "text": "Received: " + text,
+            })
         },
     )
 
