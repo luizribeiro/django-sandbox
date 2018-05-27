@@ -1,4 +1,5 @@
 import json
+import logging
 import requests
 from django.core.exceptions import PermissionDenied
 from django.http import (
@@ -8,6 +9,9 @@ from django.http import (
 )
 from django.views.decorators.csrf import csrf_exempt
 from os import environ as env
+
+
+logger = logging.getLogger(__name__)
 
 
 def _handle_received_message(
@@ -34,14 +38,20 @@ def _handle_received_message(
 def webhook(request: HttpRequest) -> HttpResponse:
     if request.method == 'GET':
         received_token = request.GET.get('hub.verify_token')
+        logger.info('token verification')
         if received_token != env.get('ROSIE_VERIFY_TOKEN'):
+            logger.info('denied')
             raise PermissionDenied
+        logger.info('all good!')
         return HttpResponse(request.GET['hub.challenge'])
 
     if request.method != 'POST':
+        logger.info('got ' + request.method)
         raise Http404
 
+    logger.info(request.body)
     data = json.loads(request.body.decode("utf-8"))
+    logger.info(data)
     if data.get('object') != 'page':
         raise Http404
 
