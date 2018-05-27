@@ -49,6 +49,7 @@ INSTALLED_APPS = (
     # my own apps
     'backend',
     'home',
+    'rosie',
 
 )
 
