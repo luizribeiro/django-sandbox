@@ -16,7 +16,7 @@ install:
 
 script:
   - mypy .
-  - pyre check
+  - pyre -l .pyre_configuration.travis check
   - coverage run --source=./ manage.py test
 
 after_success:
