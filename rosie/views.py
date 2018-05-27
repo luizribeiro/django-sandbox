@@ -1,7 +1,6 @@
 import hashlib
 import hmac
 import json
-import requests
 from django.core.exceptions import PermissionDenied
 from django.http import (
     Http404,
@@ -10,28 +9,8 @@ from django.http import (
 )
 from django.views.decorators.csrf import csrf_exempt
 from os import environ as env
+from rosie.messaging import broadcast_message
 from rosie.models import SubscribedUser
-
-
-def _send_message(
-    receiver_psid: str,
-    text: str,
-) -> None:
-    requests.post(
-        "https://graph.facebook.com/v2.6/me/messages",
-        params={
-            "access_token": env.get('ROSIE_PAGE_ACCESS_TOKEN'),
-        },
-        data={
-            "recipient": json.dumps({"id": receiver_psid}),
-            "message": json.dumps({"text": text})
-        },
-    )
-
-
-def _broadcast_to_all_subscribers(text: str) -> None:
-    for subscriber in SubscribedUser.objects.all():
-        _send_message(subscriber.user_psid, text)
 
 
 def _handle_received_message(
@@ -39,7 +18,7 @@ def _handle_received_message(
     text: str,
 ) -> None:
     SubscribedUser(user_psid=sender_psid).save()
-    _broadcast_to_all_subscribers("Broadcast: " + text)
+    broadcast_message("Broadcast: " + text)
 
 
 @csrf_exempt
