@@ -61,6 +61,8 @@ def webhook(request: HttpRequest) -> HttpResponse:
         message = entry['messaging'][0]
         if message.get('message') is None:
             continue
+        if message['message'].get('text') is None:
+            continue
         _handle_received_message(
             int(message['sender']['id']),
             str(message['message']['text']),

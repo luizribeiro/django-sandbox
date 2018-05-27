@@ -63,3 +63,40 @@ class RosieWebHookTests(TestCase):
         )
         self.assertEqual(response.status_code, 200)
 
+    def test_like_sticker_message(self) -> None:
+        response = self.client.post(
+            '/rosie/',
+            json.dumps({
+                'object': 'page',
+                'entry': [
+                    {
+                        'messaging': [
+                            {
+                                'timestamp': 1527434293975,
+                                'message': {
+                                    'attachments': [
+                                        {
+                                            'type': 'image',
+                                            'payload': {
+                                                'sticker_id': 369239263222822,
+                                                'url': 'http://cdn.net/f.png',
+                                            },
+                                        },
+                                    ],
+                                    'mid': 'mid.$FooBAr-',
+                                    'sticker_id': 369239263222822,
+                                    'seq': 1180691,
+                                },
+                                'sender': {'id': '54321'},
+                                'recipient': {'id': '12345'},
+                            },
+                        ],
+                        'time': 1527434395008,
+                        'id': '12345',
+                    },
+                ],
+            }),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200)
+
