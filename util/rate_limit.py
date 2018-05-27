@@ -12,13 +12,16 @@ def rate_limit(key, once_every):
     return _rate_limit_decorator
 
 
-def shouldnt_rate_limit(key, once_every):
+def should_rate_limit(key, once_every):
     last_hit_key = 'rate_limit:last_hit:' + key
 
     last_hit = float(get_value_or_default(last_hit_key, 0))
     time_since_last_hit = time.time() - last_hit
     if time_since_last_hit < once_every:
-        return False
+        return True
     set_key_value(last_hit_key, time.time())
-    return True
+    return False
 
+
+def shouldnt_rate_limit(key, once_every):
+    return not should_rate_limit(key, once_every)

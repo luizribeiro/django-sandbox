@@ -1,6 +1,7 @@
-import json
 import hashlib
 import hmac
+import json
+import rosie.tasks
 from django.test import (
     Client,
     TestCase,
@@ -62,6 +63,11 @@ class GraphAPIMock:
 
     def clear(self):
         self._messages = []
+
+
+class RosieTestCase(TestCase):
+    def subscribe_user(self, user_psid):
+        SubscribedUser(user_psid=user_psid).save()
 
 
 class RosieWebHookTests(TestCase):
@@ -237,3 +243,32 @@ class RosieWebHookTests(TestCase):
                 text='It is currently 16°C and Cloudy',
             ), graph_api_mock.sent_messages)
 
+
+class TaskTests(RosieTestCase):
+    USER_1_PSID = '1234'
+    USER_2_PSID = '5678'
+
+    def setUp(self) -> None:
+        self.subscribe_user(self.USER_1_PSID)
+        self.subscribe_user(self.USER_2_PSID)
+
+    def test_broadcast_message(self) -> None:
+        nest_mock = Mock(
+            thermostats=[
+                Mock(
+                    mode='off',
+                    current_temperature=24,
+                    target_temperature=23.5,
+                ),
+            ],
+        )
+        weather_lookup_mock = Mock(condition=Mock(text='Sunny', temp='32'))
+        with GraphAPIMock() as graph_api_mock, \
+            patch('rosie.tasks.Nest', return_value=nest_mock), \
+            patch('rosie.tasks.Weather.lookup', return_value=weather_lookup_mock):
+            rosie.tasks.do_checks()
+            self.assertEquals(len(graph_api_mock.sent_messages), 0)
+            weather_lookup_mock.condition.text = 'Cloudy'
+            weather_lookup_mock.condition.temp = '20'
+            rosie.tasks.do_checks()
+            self.assertEquals(len(graph_api_mock.sent_messages), 2)
