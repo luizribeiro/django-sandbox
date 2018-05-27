@@ -6,7 +6,7 @@ To do local development:
 
 ```
 % yarn
-% virtualenv venv
+% virtualenv -p python3.5 venv
 % source venv/bin/activate
 (venv) % pip install -r dev-requirements.txt
 (venv) % pyre start
