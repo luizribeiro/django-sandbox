@@ -45,6 +45,23 @@ class RosieWebHookTests(TestCase):
             **{'HTTP_X_HUB_SIGNATURE': 'sha1=' + hub_signature}
         )
 
+    def test_webhook_without_signature(self) -> None:
+        response = self.client.post(
+            '/rosie/',
+            {"object": "page"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_webhook_with_invalid_signature(self) -> None:
+        response = self.client.post(
+            '/rosie/',
+            {"object": "page"},
+            content_type="application/json",
+            **{'HTTP_X_HUB_SIGNATURE': 'sha1=asdfg'}
+        )
+        self.assertEqual(response.status_code, 403)
+
     def test_webhook_called_for_another_object_type(self) -> None:
         response = self._call_webhook({"object": "something_else"})
         self.assertEqual(response.status_code, 404)
