@@ -39,18 +39,23 @@ class RosieWebHookTests(TestCase):
         response = self.client.post(
             '/rosie/',
             json.dumps({
-                "object": "page",
-                "entry": [
+                'object': 'page',
+                'entry': [
                     {
-                        "id": "12345",
-                        "time": 1458692752478,
-                        "messaging": [
+                        'messaging': [
                             {
-                                "sender": {"id": "54321"},
-                                "recipient": {"id": "12345"},
-                                "text": "Danger, Will Robinson",
+                                'message': {
+                                    'mid': 'mid.$FooBAr-',
+                                    'text': 'asdfasdf',
+                                    'seq': 1180600,
+                                },
+                                'recipient': {'id': '12345'},
+                                'timestamp': 1527378331528,
+                                'sender': {'id': '54321'},
                             },
                         ],
+                        'id': '12345',
+                        'time': 1527432965069,
                     },
                 ],
             }),
