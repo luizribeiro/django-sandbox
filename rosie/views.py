@@ -31,7 +31,7 @@ def _send_message(
 
 def _broadcast_to_all_subscribers(text: str) -> None:
     for subscriber in SubscribedUser.objects.all():
-        _send_message(subscriber.user_psid, "Received: " + text)
+        _send_message(subscriber.user_psid, text)
 
 
 def _handle_received_message(
@@ -39,7 +39,7 @@ def _handle_received_message(
     text: str,
 ) -> None:
     SubscribedUser(user_psid=sender_psid).save()
-    _broadcast_to_all_subscribers("Received: " + text)
+    _broadcast_to_all_subscribers("Broadcast: " + text)
 
 
 @csrf_exempt
