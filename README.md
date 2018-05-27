@@ -9,6 +9,7 @@ To do local development:
 % virtualenv venv
 % source venv/bin/activate
 (venv) % pip install -r dev-requirements.txt
+(venv) % pyre start
 (venv) % ./manage.py collectstatic
 (venv) % env $(cat .env | xargs) ./manage.py runserver
 ```

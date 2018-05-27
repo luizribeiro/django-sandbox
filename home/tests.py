@@ -36,7 +36,7 @@ class VacuumTests(TransactionTestCase):
             client.force_authenticate(user=self.user)
             response = client.get('/graphql/', {'query': '{vacuum{state}}'})
             vacuum.assert_called_once_with(
-                env.get('MIROBO_IP'),
+                env.get('MIROBO_IP', '127.0.0.1'),
                 env.get('MIROBO_TOKEN'),
                 current_seq_id,
             )
