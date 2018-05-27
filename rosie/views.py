@@ -1,5 +1,7 @@
+import json
 from django.core.exceptions import PermissionDenied
 from django.http import (
+    Http404,
     HttpRequest,
     HttpResponse,
 )
@@ -12,7 +14,13 @@ def receive_message(request: HttpRequest) -> HttpResponse:
         if received_token != env.get('ROSIE_VERIFY_TOKEN'):
             raise PermissionDenied
         return HttpResponse(request.GET['hub.challenge'])
-    elif request.method == 'POST':
-        print(request)
-        return HttpResponse('Message Processed')
+
+    if request.method != 'POST':
+        raise Http404
+
+    data = json.loads(request.body.decode("utf-8"))
+    if data.get('object') != 'page':
+        raise Http404
+
+    return HttpResponse('Message Processed')
 
