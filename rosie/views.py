@@ -1,3 +1,5 @@
+import hashlib
+import hmac
 import json
 import requests
 from django.core.exceptions import PermissionDenied
@@ -40,6 +42,18 @@ def webhook(request: HttpRequest) -> HttpResponse:
 
     if request.method != 'POST':
         raise Http404
+
+    try:
+        expected_signature = hmac.new(
+            (env.get('ROSIE_APP_SECRET') or '').encode('utf-8'),
+            request.body,
+            hashlib.sha1,
+        ).hexdigest()
+        hub_signature = request.META['HTTP_X_HUB_SIGNATURE'].split('=')[1]
+        if not hmac.compare_digest(expected_signature, hub_signature):
+            raise PermissionDenied
+    except BaseException:
+        raise PermissionDenied
 
     data = json.loads(request.body.decode("utf-8"))
     if data.get('object') != 'page':
