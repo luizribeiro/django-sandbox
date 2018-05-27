@@ -42,8 +42,14 @@ class RosieWebHookTests(TestCase):
                 "object": "page",
                 "entry": [
                     {
+                        "id": "12345",
+                        "time": 1458692752478,
                         "messaging": [
-                            {"message": "TEST_MESSAGE"},
+                            {
+                                "sender": {"id": "54321"},
+                                "recipient": {"id": "12345"},
+                                "text": "Danger, Will Robinson",
+                            },
                         ],
                     },
                 ],
