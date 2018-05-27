@@ -13,7 +13,7 @@ from os import environ as env
 
 
 def _handle_received_message(
-    sender_psid: int,
+    sender_psid: str,
     text: str,
 ) -> None:
     requests.post(
@@ -23,7 +23,7 @@ def _handle_received_message(
         },
         data={
             "recipient": json.dumps({
-                "id": str(sender_psid),
+                "id": sender_psid,
             }),
             "message": json.dumps({
                 "text": "Received: " + text,
@@ -68,7 +68,7 @@ def webhook(request: HttpRequest) -> HttpResponse:
         if message['message'].get('text') is None:
             continue
         _handle_received_message(
-            int(message['sender']['id']),
+            str(message['sender']['id']),
             str(message['message']['text']),
         )
 
