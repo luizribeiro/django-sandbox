@@ -11,11 +11,12 @@ env:
     - BUILD_ON_TRAVIS=true
 
 install:
-  - pip install -r requirements.txt
-  - pip install coveralls mypy
+  - pip install -r dev-requirements.txt
+  - pip install coveralls
 
 script:
   - mypy .
+  - pyre check
   - coverage run --source=./ manage.py test
 
 after_success:

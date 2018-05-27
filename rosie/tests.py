@@ -188,16 +188,16 @@ class RosieWebHookTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_subscribe_on_message(self) -> None:
-        subscribed_users = SubscribedUser.objects.all()
+        subscribed_users = SubscribedUser.get_all_subscribers()
         self.assertEquals(len(subscribed_users), 0)
 
         self._send_message_to_webhook('42', 'subscribe pls')
-        subscribed_users = SubscribedUser.objects.all()
+        subscribed_users = SubscribedUser.get_all_subscribers()
         self.assertEquals(len(subscribed_users), 1)
         self.assertEquals(subscribed_users[0].user_psid, '42')
 
         self._send_message_to_webhook('42', 'im already subscribed')
-        subscribed_users = SubscribedUser.objects.all()
+        subscribed_users = SubscribedUser.get_all_subscribers()
         self.assertEquals(len(subscribed_users), 1)
 
     def test_broadcast_on_message(self) -> None:

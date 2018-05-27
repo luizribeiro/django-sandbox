@@ -1,6 +1,7 @@
 from django.conf import settings
 from importlib import import_module
 import graphene
+from typing import cast
 
 
 def _build_query() -> graphene.ObjectType:
@@ -12,7 +13,10 @@ def _build_query() -> graphene.ObjectType:
         except ImportError:
             pass
     bases.append(graphene.ObjectType)
-    return type('Query', tuple(bases), {})
+    return cast(
+        graphene.ObjectType,
+        type('Query', tuple(bases), {}),
+    )
 
 
 def _build_mutation() -> graphene.ObjectType:
@@ -24,7 +28,10 @@ def _build_mutation() -> graphene.ObjectType:
         except ImportError:
             pass
     bases.append(graphene.ObjectType)
-    return type('Mutation', tuple(bases), {})
+    return cast(
+        graphene.ObjectType,
+        type('Mutation', tuple(bases), {}),
+    )
 
 
 schema = graphene.Schema(query=_build_query(), mutation=_build_mutation())

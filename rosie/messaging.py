@@ -21,6 +21,6 @@ def send_message(
 
 
 def broadcast_message(text: str) -> None:
-    for subscriber in SubscribedUser.objects.all():
+    for subscriber in SubscribedUser.get_all_subscribers():
         send_message(subscriber.user_psid, text)
 

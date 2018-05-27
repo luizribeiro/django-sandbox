@@ -9,3 +9,4 @@ yarn.lock
 dist
 .mypy_cache
 debug.log
+.pyre

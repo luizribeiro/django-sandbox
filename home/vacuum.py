@@ -44,19 +44,27 @@ class VacuumError(Enum):
 class Vacuum:
     def __init__(self) -> None:
         self._vacuum = miio.Vacuum(
-            environ.get('MIROBO_IP'),
+            environ.get('MIROBO_IP') or '127.0.0.1',
             environ.get('MIROBO_TOKEN'),
             int(get_value_or_default('vacuum_seq', '0')),
         )
 
+    async def async_read_status(self) -> miio.VacuumStatus:
+        # pyre-fixme[12] can't use @threaded_async with pyre
+        return await self._async_read_status()
+
+    async def async_start(self) -> None:
+        # pyre-fixme[12] can't use @threaded_async with pyre
+        return await self._async_start()
+
     @threaded_async
-    def async_read_status(self) -> miio.VacuumStatus:
+    def _async_read_status(self) -> miio.VacuumStatus:
         status = self._vacuum.status()
         set_key_value('vacuum_seq', str(self._vacuum.raw_id))
         return status
 
     @threaded_async
-    def async_start(self) -> None:
+    def _async_start(self) -> None:
         self._vacuum.start()
         set_key_value('vacuum_seq', str(self._vacuum.raw_id))
 

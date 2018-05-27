@@ -1,2 +1,4 @@
 -r requirements.txt
+mypy==0.600
+pyre-check==0.0.7
 whitenoise==3.3.1
