@@ -1,5 +1,6 @@
 from contextlib import contextmanager
 from io import StringIO
+import os
 import sys
 
 
@@ -12,4 +13,15 @@ def captured_output():
         yield sys.stdout, sys.stderr
     finally:
         sys.stdout, sys.stderr = old_out, old_err
+
+
+@contextmanager
+def set_env(**environ):
+    old_environ = dict(os.environ)
+    os.environ.update(environ)
+    try:
+        yield
+    finally:
+        os.environ.clear()
+        os.environ.update(old_environ)
 
