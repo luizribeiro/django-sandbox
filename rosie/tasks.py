@@ -1,7 +1,10 @@
 from backend import scheduler
 from nest import Nest
 from os import environ as env
-from rosie.messaging import broadcast_message
+from rosie.messaging import (
+    QuickReply,
+    broadcast_message,
+)
 from util.rate_limit import should_rate_limit
 from weather import (Weather, Unit)
 
@@ -33,6 +36,10 @@ def _check_if_should_open_windows() -> None:
                 lookup.condition.text,
                 float(thermostat.temperature),
             ),
+        [
+            QuickReply('text', 'Sure!', 'TURN_OFF_THERMOSTAT'),
+            QuickReply('text', 'Not today', None),
+        ],
     )
 
 
