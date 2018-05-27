@@ -23,7 +23,7 @@ def send_message(
     text: str,
     quick_replies: Optional[List[QuickReply]] = None,
 ) -> None:
-    message: Dict[str, Any] = {"text": text}
+    message = {"text": text}  # type: Dict[str, Any]
     if quick_replies:
         message['quick_replies'] = [{
             'content_type': quick_reply.content_type,
