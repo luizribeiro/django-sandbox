@@ -8,3 +8,4 @@ djangorestframework==3.8.2
 django-rest-auth[with_social]==0.9.3
 -e git://github.com/luizribeiro/django-keyvaluestore.git#egg=django-keyvaluestore
 requests==2.18.4
+weather-api==1.0.3

@@ -9,14 +9,26 @@ from django.http import (
 )
 from django.views.decorators.csrf import csrf_exempt
 from os import environ as env
-from rosie.messaging import broadcast_message
+from rosie.messaging import (send_message, broadcast_message)
 from rosie.models import SubscribedUser
+from weather import (Weather, Unit)
 
 
 def _handle_received_message(
     sender_psid: str,
     text: str,
 ) -> None:
+    if 'weather' in text.strip().lower():
+        weather = Weather(unit=Unit.CELSIUS)
+        lookup = weather.lookup(12761323)
+        send_message(
+            sender_psid,
+            'It is currently %s°C and %s' % (
+                lookup.condition.temp,
+                lookup.condition.text,
+            ),
+        )
+        return
     SubscribedUser(user_psid=sender_psid).save()
     broadcast_message("Broadcast: " + text)
 

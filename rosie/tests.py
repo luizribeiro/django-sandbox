@@ -14,7 +14,7 @@ from typing import (
     List,
     NamedTuple,
 )
-from unittest.mock import patch
+from unittest.mock import (patch, Mock)
 from util.tests import set_env
 
 
@@ -222,5 +222,18 @@ class RosieWebHookTests(TestCase):
             self.assertIn(SentMessage(
                 recipient_psid='64',
                 text='Broadcast: hi there',
+            ), graph_api_mock.sent_messages)
+
+    def test_replies_with_weather(self) -> None:
+        lookup = Mock(condition=Mock(text='Cloudy', temp='16'))
+        with patch(
+            'rosie.views.Weather.lookup',
+            return_value=lookup,
+        ), GraphAPIMock() as graph_api_mock:
+            self._send_message_to_webhook('42', 'tell me the weather')
+            self.assertEquals(len(graph_api_mock.sent_messages), 1)
+            self.assertIn(SentMessage(
+                recipient_psid='42',
+                text='It is currently 16°C and Cloudy',
             ), graph_api_mock.sent_messages)
 
