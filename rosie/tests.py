@@ -11,8 +11,57 @@ from rosie.models import SubscribedUser
 from typing import (
     Any,
     Dict,
+    List,
+    NamedTuple,
 )
+from unittest.mock import patch
 from util.tests import set_env
+
+
+SentMessage = NamedTuple('SentMessage', [
+    ('recipient_psid', str),
+    ('text', str),
+])
+
+
+class GraphAPIMock:
+    def __init__(self):
+        self.requests_post_mock = patch(
+            'requests.post',
+            side_effect=self._mock_post,
+        )
+        self._messages = []
+
+    def __enter__(self):
+        self.requests_post_mock.__enter__()
+        return self
+
+    def __exit__(
+        self,
+        exception_type,
+        exception_value,
+        exception_traceback,
+    ):
+        self.requests_post_mock.__exit__(
+            exception_type,
+            exception_value,
+            exception_traceback,
+        )
+
+    def _mock_post(self, uri, params={}, data={}) -> None:
+        recipient = json.loads(data.get('recipient', '{}'))
+        message = json.loads(data.get('message', '{}'))
+        self._messages.append(SentMessage(
+            recipient_psid=recipient.get('id'),
+            text=message.get('text'),
+        ))
+
+    @property
+    def sent_messages(self) -> List[SentMessage]:
+        return self._messages
+
+    def clear(self):
+        self._messages = []
 
 
 class RosieWebHookTests(TestCase):
@@ -150,4 +199,28 @@ class RosieWebHookTests(TestCase):
         self._send_message_to_webhook('42', 'im already subscribed')
         subscribed_users = SubscribedUser.objects.all()
         self.assertEquals(len(subscribed_users), 1)
+
+    def test_broadcast_on_message(self) -> None:
+        with GraphAPIMock() as graph_api_mock:
+            self.assertEquals(len(graph_api_mock.sent_messages), 0)
+
+            self._send_message_to_webhook('42', 'subscribe pls')
+            self.assertEquals(len(graph_api_mock.sent_messages), 1)
+            self.assertEquals(graph_api_mock.sent_messages[0], SentMessage(
+                recipient_psid='42',
+                text='Broadcast: subscribe pls',
+            ))
+
+            graph_api_mock.clear()
+
+            self._send_message_to_webhook('64', 'hi there')
+            self.assertEquals(len(graph_api_mock.sent_messages), 2)
+            self.assertIn(SentMessage(
+                recipient_psid='42',
+                text='Broadcast: hi there',
+            ), graph_api_mock.sent_messages)
+            self.assertIn(SentMessage(
+                recipient_psid='64',
+                text='Broadcast: hi there',
+            ), graph_api_mock.sent_messages)
 
