@@ -13,25 +13,33 @@ from os import environ as env
 from rosie.models import SubscribedUser
 
 
-def _handle_received_message(
-    sender_psid: str,
+def _send_message(
+    receiver_psid: str,
     text: str,
 ) -> None:
-    SubscribedUser(user_psid=sender_psid).save()
     requests.post(
         "https://graph.facebook.com/v2.6/me/messages",
         params={
             "access_token": env.get('ROSIE_PAGE_ACCESS_TOKEN'),
         },
         data={
-            "recipient": json.dumps({
-                "id": sender_psid,
-            }),
-            "message": json.dumps({
-                "text": "Received: " + text,
-            })
+            "recipient": json.dumps({"id": receiver_psid}),
+            "message": json.dumps({"text": text})
         },
     )
+
+
+def _broadcast_to_all_subscribers(text: str) -> None:
+    for subscriber in SubscribedUser.objects.all():
+        _send_message(subscriber.user_psid, "Received: " + text)
+
+
+def _handle_received_message(
+    sender_psid: str,
+    text: str,
+) -> None:
+    SubscribedUser(user_psid=sender_psid).save()
+    _broadcast_to_all_subscribers("Received: " + text)
 
 
 @csrf_exempt
