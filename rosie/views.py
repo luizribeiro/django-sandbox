@@ -6,6 +6,7 @@ from django.http import (
     HttpRequest,
     HttpResponse,
 )
+from django.views.decorators.csrf import csrf_exempt
 from os import environ as env
 
 
@@ -29,6 +30,7 @@ def _handle_received_message(
     )
 
 
+@csrf_exempt
 def webhook(request: HttpRequest) -> HttpResponse:
     if request.method == 'GET':
         received_token = request.GET.get('hub.verify_token')
