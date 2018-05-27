@@ -10,12 +10,14 @@ from django.http import (
 )
 from django.views.decorators.csrf import csrf_exempt
 from os import environ as env
+from rosie.models import SubscribedUser
 
 
 def _handle_received_message(
     sender_psid: str,
     text: str,
 ) -> None:
+    SubscribedUser(user_psid=sender_psid).save()
     requests.post(
         "https://graph.facebook.com/v2.6/me/messages",
         params={

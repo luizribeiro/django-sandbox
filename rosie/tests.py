@@ -1,9 +1,17 @@
 import json
 import hashlib
 import hmac
-from django.test import Client
+from django.test import (
+    Client,
+    TestCase,
+)
 from os import environ as env
-from unittest import TestCase
+from django.http import HttpResponse
+from rosie.models import SubscribedUser
+from typing import (
+    Any,
+    Dict,
+)
 from util.tests import set_env
 
 
@@ -31,10 +39,10 @@ class RosieWebHookTests(TestCase):
         self.assertEqual(response.content, b'12345')
 
     @set_env(ROSIE_APP_SECRET='my_app_secret')
-    def _call_webhook(self, content):
+    def _call_webhook(self, content: Dict[str, Any]) -> HttpResponse:
         json_content = json.dumps(content)
         hub_signature = hmac.new(
-            env.get('ROSIE_APP_SECRET').encode('utf-8'),
+            (env.get('ROSIE_APP_SECRET') or '').encode('utf-8'),
             json_content.encode('utf-8'),
             hashlib.sha1,
         ).hexdigest()
@@ -66,8 +74,12 @@ class RosieWebHookTests(TestCase):
         response = self._call_webhook({"object": "something_else"})
         self.assertEqual(response.status_code, 404)
 
-    def test_receive_message(self) -> None:
-        response = self._call_webhook({
+    def _send_message_to_webhook(
+        self,
+        sender_psid: str,
+        text: str,
+    ) -> HttpResponse:
+        return self._call_webhook({
             'object': 'page',
             'entry': [
                 {
@@ -75,12 +87,12 @@ class RosieWebHookTests(TestCase):
                         {
                             'message': {
                                 'mid': 'mid.$FooBAr-',
-                                'text': 'asdfasdf',
+                                'text': text,
                                 'seq': 1180600,
                             },
                             'recipient': {'id': '12345'},
                             'timestamp': 1527378331528,
-                            'sender': {'id': '54321'},
+                            'sender': {'id': sender_psid},
                         },
                     ],
                     'id': '12345',
@@ -88,6 +100,9 @@ class RosieWebHookTests(TestCase):
                 },
             ],
         })
+
+    def test_receive_message(self) -> None:
+        response = self._send_message_to_webhook('54321', 'asdfasdf')
         self.assertEqual(response.status_code, 200)
 
     def test_like_sticker_message(self) -> None:
@@ -122,4 +137,17 @@ class RosieWebHookTests(TestCase):
             ],
         })
         self.assertEqual(response.status_code, 200)
+
+    def test_subscribe_on_message(self) -> None:
+        subscribed_users = SubscribedUser.objects.all()
+        self.assertEquals(len(subscribed_users), 0)
+
+        self._send_message_to_webhook('42', 'subscribe pls')
+        subscribed_users = SubscribedUser.objects.all()
+        self.assertEquals(len(subscribed_users), 1)
+        self.assertEquals(subscribed_users[0].user_psid, '42')
+
+        self._send_message_to_webhook('42', 'im already subscribed')
+        subscribed_users = SubscribedUser.objects.all()
+        self.assertEquals(len(subscribed_users), 1)
 
