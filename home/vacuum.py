@@ -44,7 +44,7 @@ class VacuumError(Enum):
 class Vacuum:
     def __init__(self) -> None:
         self._vacuum = miio.Vacuum(
-            environ.get('MIROBO_IP') or '127.0.0.1',
+            environ.get('MIROBO_IP', '127.0.0.1'),
             environ.get('MIROBO_TOKEN'),
             int(get_value_or_default('vacuum_seq', '0')),
         )
