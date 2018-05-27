@@ -3,6 +3,6 @@ from django.urls import path
 import rosie.views
 
 urlpatterns = [
-    path('', rosie.views.receive_message),
+    path('', rosie.views.webhook),
 ]
 

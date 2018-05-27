@@ -8,7 +8,7 @@ from django.http import (
 from os import environ as env
 
 
-def receive_message(request: HttpRequest) -> HttpResponse:
+def webhook(request: HttpRequest) -> HttpResponse:
     if request.method == 'GET':
         received_token = request.GET.get('hub.verify_token')
         if received_token != env.get('ROSIE_VERIFY_TOKEN'):
