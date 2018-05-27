@@ -73,8 +73,8 @@ class GraphQLQueryTests(TransactionTestCase):
             thermostats=[
                 MagicMock(
                     mode='off',
-                    current_temperature=24,
-                    target_temperature=23.5,
+                    temperature=24,
+                    target=23.5,
                 ),
             ],
         )

@@ -253,15 +253,9 @@ class TaskTests(RosieTestCase):
         self.subscribe_user(self.USER_2_PSID)
 
     def test_broadcast_message(self) -> None:
-        nest_mock = Mock(
-            thermostats=[
-                Mock(
-                    mode='off',
-                    current_temperature=24,
-                    target_temperature=23.5,
-                ),
-            ],
-        )
+        nest_mock = Mock(thermostats=[
+            Mock(mode='off', temperature=24, target=23.5),
+        ])
         weather_lookup_mock = Mock(condition=Mock(text='Sunny', temp='32'))
         with GraphAPIMock() as graph_api_mock, \
             patch('rosie.tasks.Nest', return_value=nest_mock), \

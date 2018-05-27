@@ -17,7 +17,7 @@ def _check_if_should_open_windows() -> None:
     )
     thermostat = nest.thermostats[0]
 
-    if float(lookup.condition.temp) >= float(thermostat.current_temperature):
+    if float(lookup.condition.temp) >= float(thermostat.temperature):
         # it is hot outside
         return
 
@@ -31,7 +31,7 @@ def _check_if_should_open_windows() -> None:
             ' %.1f°C.') % (
                 lookup.condition.temp,
                 lookup.condition.text,
-                float(thermostat.current_temperature),
+                float(thermostat.temperature),
             ),
     )
 
