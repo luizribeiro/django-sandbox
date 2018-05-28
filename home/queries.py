@@ -3,21 +3,15 @@ from os import environ as env
 import graphene
 
 from home.graphql_common import VacuumState
+from home.thermostat import (
+    Thermostat as ThermostatClient,
+    ThermostatMode,
+)
 from home.vacuum import Vacuum as VacuumClient
-from nest import Nest
-from util.async import threaded_async
-
-
-class ThermostatMode(graphene.Enum):
-    OFF = 'off'
-    ECO = 'eco'
-    COOL = 'cool'
-    HEAT = 'heat'
-    HEAT_COOL = 'heat-cool'
 
 
 class Thermostat(graphene.ObjectType):
-    mode = graphene.Field(ThermostatMode)
+    mode = graphene.Field(graphene.Enum.from_enum(ThermostatMode))
     current_temperature = graphene.Float()
     target_temperature = graphene.Float()
 
@@ -33,18 +27,12 @@ class Query(graphene.ObjectType):
     thermostat = graphene.Field(Thermostat, description='Nest Thermostat')
     vacuum = graphene.Field(Vacuum, description='Xiaomi Mi Robot Vacuum')
 
-    @threaded_async
-    def resolve_thermostat(self, info: ResolveInfo) -> Thermostat:
-        nest = Nest(
-            client_id=env.get('NEST_CLIENT_ID'),
-            client_secret=env.get('NEST_CLIENT_SECRET'),
-            access_token=env.get('NEST_ACCESS_TOKEN'),
-        )
-        thermostat = nest.thermostats[0]
+    async def resolve_thermostat(self, info: ResolveInfo) -> Thermostat:
+        status = await ThermostatClient().async_read_status()
         return Thermostat(
-            mode=thermostat.mode,
-            current_temperature=thermostat.temperature,
-            target_temperature=thermostat.target,
+            mode=status.mode,
+            current_temperature=status.current_temperature,
+            target_temperature=status.target_temperature,
         )
 
     async def resolve_vacuum(self, info: ResolveInfo) -> Vacuum:

@@ -86,7 +86,7 @@ class GraphQLQueryTests(TransactionTestCase):
             raw_id=42,
         )
 
-        with patch('home.queries.Nest', return_value=nest_mock), \
+        with patch('home.thermostat.Nest', return_value=nest_mock), \
                 patch('home.vacuum.miio.Vacuum', return_value=vacuum_mock):
             client = APIClient()
             client.force_authenticate(user=self.user)
