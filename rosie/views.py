@@ -1,6 +1,7 @@
 import hashlib
 import hmac
 import json
+import logging
 from django.core.exceptions import PermissionDenied
 from django.http import (
     Http404,
@@ -13,6 +14,9 @@ from rosie.messaging import (send_message, broadcast_message)
 from rosie.models import SubscribedUser
 from weather import (Weather, Unit)
 from typing import Optional
+
+
+logger = logging.getLogger('rosie')
 
 
 def _handle_received_message(
@@ -76,6 +80,7 @@ def webhook(request: HttpRequest) -> HttpResponse:
             continue
         if message['message'].get('text') is None:
             continue
+        logger.info(str(message))
         _handle_received_message(
             str(message['sender']['id']),
             str(message['message']['text']),
