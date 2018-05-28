@@ -48,7 +48,7 @@ class Thermostat:
     @threaded_async
     def _async_set_mode(self, mode: ThermostatMode) -> None:
         thermostat = self.nest.thermostats[0]
-        thermostat.mode = str(mode)
+        thermostat.mode = mode.value
 
     async def async_set_mode(self, mode: ThermostatMode) -> None:
         # pyre-fixme[12] can't use @threaded_async with pyre
