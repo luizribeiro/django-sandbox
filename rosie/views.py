@@ -50,7 +50,7 @@ async def _handle_received_message(
         )
         return
 
-    broadcast_message("Broadcast: " + text)
+    send_message(sender_psid, "Sorry, I didn't understand that.")
 
 
 @csrf_exempt

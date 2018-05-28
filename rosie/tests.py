@@ -207,29 +207,14 @@ class RosieWebHookTests(TestCase):
         subscribed_users = SubscribedUser.get_all_subscribers()
         self.assertEquals(len(subscribed_users), 1)
 
-    def test_broadcast_on_message(self) -> None:
+    def test_unknown_command(self) -> None:
         with GraphAPIMock() as graph_api_mock:
-            self.assertEquals(len(graph_api_mock.sent_messages), 0)
-
-            self._send_message_to_webhook('42', 'subscribe pls')
+            self._send_message_to_webhook('42', 'hey what is up Roses')
             self.assertEquals(len(graph_api_mock.sent_messages), 1)
             self.assertEquals(graph_api_mock.sent_messages[0], SentMessage(
                 recipient_psid='42',
-                text='Broadcast: subscribe pls',
+                text="Sorry, I didn't understand that.",
             ))
-
-            graph_api_mock.clear()
-
-            self._send_message_to_webhook('64', 'hi there')
-            self.assertEquals(len(graph_api_mock.sent_messages), 2)
-            self.assertIn(SentMessage(
-                recipient_psid='42',
-                text='Broadcast: hi there',
-            ), graph_api_mock.sent_messages)
-            self.assertIn(SentMessage(
-                recipient_psid='64',
-                text='Broadcast: hi there',
-            ), graph_api_mock.sent_messages)
 
     def test_replies_with_weather(self) -> None:
         lookup = Mock(condition=Mock(text='Cloudy', temp='16'))
