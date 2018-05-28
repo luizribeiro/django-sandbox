@@ -38,7 +38,7 @@ def _check_if_should_open_windows() -> None:
             ),
         [
             QuickReply('text', 'Sure!', 'TURN_OFF_THERMOSTAT'),
-            QuickReply('text', 'Not today', None),
+            QuickReply('text', 'Not today', 'NOOP'),
         ],
     )
 

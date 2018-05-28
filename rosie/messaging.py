@@ -14,17 +14,8 @@ from typing import (
 QuickReply = NamedTuple('QuickReply', [
     ('content_type', str),
     ('title', str),
-    ('payload', Optional[str]),
+    ('payload', str),
 ])
-
-def quick_reply_to_dict(quick_reply: QuickReply) -> Dict[str, Any]:
-    ret = {
-        'content_type': quick_reply.content_type,
-        'title': quick_reply.title,
-    }
-    if quick_reply.payload:
-        ret['payload'] = quick_reply.payload
-    return ret
 
 
 def send_message(
@@ -32,12 +23,13 @@ def send_message(
     text: str,
     quick_replies: Optional[List[QuickReply]] = None,
 ) -> None:
-    message = {"text": text}  #type: Dict[str, Any]
+    message = {"text": text}  # type: Dict[str, Any]
     if quick_replies:
-        message['quick_replies'] = [
-            quick_reply_to_dict(quick_reply)
-            for quick_reply in quick_replies
-        ]
+        message['quick_replies'] = [{
+            'content_type': quick_reply.content_type,
+            'title': quick_reply.title,
+            'payload': quick_reply.payload,
+        } for quick_reply in quick_replies]
     requests.post(
         "https://graph.facebook.com/v2.6/me/messages",
         params={
