@@ -12,12 +12,20 @@ from os import environ as env
 from rosie.messaging import (send_message, broadcast_message)
 from rosie.models import SubscribedUser
 from weather import (Weather, Unit)
+from typing import Optional
 
 
 def _handle_received_message(
     sender_psid: str,
     text: str,
+    payload: Optional[str],
 ) -> None:
+    SubscribedUser(user_psid=sender_psid).save()
+
+    if payload == 'TURN_OFF_THERMOSTAT':
+        broadcast_message("Okay! I'll go ahead and turn off the thermostat")
+        return
+
     if 'weather' in text.strip().lower():
         weather = Weather(unit=Unit.CELSIUS)
         lookup = weather.lookup(12761323)
@@ -29,7 +37,7 @@ def _handle_received_message(
             ),
         )
         return
-    SubscribedUser(user_psid=sender_psid).save()
+
     broadcast_message("Broadcast: " + text)
 
 
@@ -71,6 +79,7 @@ def webhook(request: HttpRequest) -> HttpResponse:
         _handle_received_message(
             str(message['sender']['id']),
             str(message['message']['text']),
+            message['message'].get('quick_reply', {}).get('payload'),
         )
 
     return HttpResponse('Message Processed')
