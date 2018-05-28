@@ -16,6 +16,7 @@ from typing import (
     NamedTuple,
 )
 from unittest.mock import (patch, Mock)
+from util.async import sync
 from util.tests import set_env
 
 
@@ -252,17 +253,18 @@ class TaskTests(RosieTestCase):
         self.subscribe_user(self.USER_1_PSID)
         self.subscribe_user(self.USER_2_PSID)
 
-    def test_broadcast_message(self) -> None:
+    @sync
+    async def test_broadcast_message(self) -> None:
         nest_mock = Mock(thermostats=[
             Mock(mode='off', temperature=24, target=23.5),
         ])
         weather_lookup_mock = Mock(condition=Mock(text='Sunny', temp='32'))
         with GraphAPIMock() as graph_api_mock, \
-            patch('rosie.tasks.Nest', return_value=nest_mock), \
+            patch('home.thermostat.Nest', return_value=nest_mock), \
             patch('rosie.tasks.Weather.lookup', return_value=weather_lookup_mock):
-            rosie.tasks.do_checks()
+            await rosie.tasks.async_do_checks()
             self.assertEquals(len(graph_api_mock.sent_messages), 0)
             weather_lookup_mock.condition.text = 'Cloudy'
             weather_lookup_mock.condition.temp = '20'
-            rosie.tasks.do_checks()
+            await rosie.tasks.async_do_checks()
             self.assertEquals(len(graph_api_mock.sent_messages), 2)

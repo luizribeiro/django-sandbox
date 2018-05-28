@@ -1,5 +1,5 @@
 from backend import scheduler
-from nest import Nest
+from home.thermostat import Thermostat
 from os import environ as env
 from rosie.messaging import (
     QuickReply,
@@ -9,18 +9,13 @@ from util.rate_limit import should_rate_limit
 from weather import (Weather, Unit)
 
 
-def _check_if_should_open_windows() -> None:
+async def _async_check_if_should_open_windows() -> None:
     weather = Weather(unit=Unit.CELSIUS)
     lookup = weather.lookup(12761323)
 
-    nest = Nest(
-        client_id=env.get('NEST_CLIENT_ID'),
-        client_secret=env.get('NEST_CLIENT_SECRET'),
-        access_token=env.get('NEST_ACCESS_TOKEN'),
-    )
-    thermostat = nest.thermostats[0]
+    thermostat = await Thermostat().async_read_status()
 
-    if float(lookup.condition.temp) >= float(thermostat.temperature):
+    if float(lookup.condition.temp) >= float(thermostat.target_temperature):
         # it is hot outside
         return
 
@@ -34,7 +29,7 @@ def _check_if_should_open_windows() -> None:
             ' %.1f°C.') % (
                 lookup.condition.temp,
                 lookup.condition.text,
-                float(thermostat.temperature),
+                float(thermostat.target_temperature),
             ),
         [
             QuickReply('text', 'Sure!', 'TURN_OFF_THERMOSTAT'),
@@ -45,6 +40,6 @@ def _check_if_should_open_windows() -> None:
 
 
 @scheduler.scheduled_job('interval', minutes=5)
-def do_checks() -> None:
-    _check_if_should_open_windows()
+async def async_do_checks() -> None:
+    await _async_check_if_should_open_windows()
 
