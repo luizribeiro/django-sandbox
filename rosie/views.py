@@ -16,7 +16,8 @@ from weather import (Weather, Unit)
 from typing import Optional
 
 
-logger = logging.getLogger('rosie')
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def _handle_received_message(
@@ -47,8 +48,6 @@ def _handle_received_message(
 
 @csrf_exempt
 def webhook(request: HttpRequest) -> HttpResponse:
-    logger.info('Got a new request')
-    logger.info(str(request))
     logger.info(str(request.body))
     if request.method == 'GET':
         received_token = request.GET.get('hub.verify_token')
