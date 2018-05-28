@@ -9,18 +9,24 @@ from django.http import (
     HttpResponse,
 )
 from django.views.decorators.csrf import csrf_exempt
+from home.thermostat import (
+    Thermostat,
+    ThermostatMode,
+)
 from os import environ as env
 from rosie.messaging import (send_message, broadcast_message)
 from rosie.models import SubscribedUser
 from weather import (Weather, Unit)
 from typing import Optional
+from util.async import sync
 
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def _handle_received_message(
+@sync
+async def _handle_received_message(
     sender_psid: str,
     text: str,
     payload: Optional[str],
@@ -29,6 +35,7 @@ def _handle_received_message(
 
     if payload == 'TURN_OFF_THERMOSTAT':
         broadcast_message("Okay! I'll go ahead and turn off the thermostat")
+        await Thermostat().async_set_mode(ThermostatMode.OFF)
         return
 
     if 'weather' in text.strip().lower():
