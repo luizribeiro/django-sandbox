@@ -265,6 +265,9 @@ class TaskTests(RosieTestCase):
             await rosie.tasks.async_do_checks()
             self.assertEquals(len(graph_api_mock.sent_messages), 0)
             weather_lookup_mock.condition.text = 'Cloudy'
+            weather_lookup_mock.condition.temp = '14'
+            await rosie.tasks.async_do_checks()
+            self.assertEquals(len(graph_api_mock.sent_messages), 0)
             weather_lookup_mock.condition.temp = '20'
             await rosie.tasks.async_do_checks()
             self.assertEquals(len(graph_api_mock.sent_messages), 2)

@@ -19,6 +19,10 @@ async def _async_check_if_should_open_windows() -> None:
         # it is hot outside
         return
 
+    if float(lookup.condition.temp) < 15:
+        # it is too cold outside
+        return
+
     if should_rate_limit('_check_if_should_open_windows', once_every=3600*12):
         # we've sent this message recently
         return
