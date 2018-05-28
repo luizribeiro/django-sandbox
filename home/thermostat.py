@@ -25,14 +25,16 @@ class ThermostatInfo:
 
 
 class Thermostat:
-    @threaded_async
-    def _async_read_status(self) -> ThermostatInfo:
-        nest = Nest(
+    def __init__(self) -> None:
+        self.nest = Nest(
             client_id=env.get('NEST_CLIENT_ID'),
             client_secret=env.get('NEST_CLIENT_SECRET'),
             access_token=env.get('NEST_ACCESS_TOKEN'),
         )
-        thermostat = nest.thermostats[0]
+
+    @threaded_async
+    def _async_read_status(self) -> ThermostatInfo:
+        thermostat = self.nest.thermostats[0]
         return ThermostatInfo(
             mode=thermostat.mode,
             current_temperature=thermostat.temperature,
