@@ -18,10 +18,12 @@ class ThermostatInfo:
         mode: ThermostatMode,
         current_temperature: float,
         target_temperature: float,
+        is_away: bool,
     ) -> None:
         self.mode = mode
         self.current_temperature = current_temperature
         self.target_temperature = target_temperature
+        self.is_away = is_away
 
 
 class Thermostat:
@@ -35,10 +37,12 @@ class Thermostat:
     @threaded_async
     def _async_read_status(self) -> ThermostatInfo:
         thermostat = self.nest.thermostats[0]
+        structure = thermostat.structure
         return ThermostatInfo(
             mode=thermostat.mode,
             current_temperature=thermostat.temperature,
             target_temperature=thermostat.target,
+            is_away=(structure.away == 'away'),
         )
 
     async def async_read_status(self) -> ThermostatInfo:

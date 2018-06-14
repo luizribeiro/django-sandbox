@@ -5,6 +5,7 @@ from home.vacuum import (
 )
 from django.contrib.auth.models import User
 from django.test import TransactionTestCase
+from home.thermostat import Thermostat
 from keyvaluestore.utils import get_value_or_default
 import json
 from os import environ as env
@@ -58,6 +59,27 @@ class VacuumTests(TransactionTestCase):
         assert json.loads(response.content.decode('utf-8')) == {'data': {
             'vacuum': {'state': 'CHARGING'},
         }}
+
+
+class ThermostatTests(TransactionTestCase):
+    @sync
+    async def test_away_mode(self) -> None:
+        nest_mock = MagicMock(
+            thermostats=[
+                MagicMock(
+                    mode='off',
+                    temperature=24,
+                    target=23.5,
+                    structure=MagicMock(away='away'),
+                ),
+            ],
+        )
+        with patch('home.thermostat.Nest', return_value=nest_mock):
+            status = await Thermostat().async_read_status()
+            self.assertTrue(status.is_away)
+            nest_mock.thermostats[0].structure.away = 'home'
+            status = await Thermostat().async_read_status()
+            self.assertFalse(status.is_away)
 
 
 class GraphQLQueryTests(TransactionTestCase):
