@@ -229,6 +229,21 @@ class RosieWebHookTests(TestCase):
                 text='It is currently 16°C and Cloudy',
             ), graph_api_mock.sent_messages)
 
+    def test_error_handling(self) -> None:
+        with patch(
+            'rosie.views._handle_received_message',
+            side_effect = Exception('shits on fire')
+        ), GraphAPIMock() as graph_api_mock:
+            response = self._send_message_to_webhook('42', 'wassup')
+            self.assertEqual(response.status_code, 200)
+            self.assertEquals(len(graph_api_mock.sent_messages), 1)
+            sent_message = graph_api_mock.sent_messages[0]
+            self.assertEquals(sent_message.recipient_psid, '42')
+            self.assertTrue(sent_message.text.startswith(
+                "Sorry. Something went wrong while handling that message. " +
+                    "I hope this helps:\n\n```Traceback (most recent call last):\n",
+            ))
+
 
 class TaskTests(RosieTestCase):
     USER_1_PSID = '1234'

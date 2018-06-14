@@ -2,6 +2,7 @@ import hashlib
 import hmac
 import json
 import logging
+import traceback
 from django.core.exceptions import PermissionDenied
 from django.http import (
     Http404,
@@ -90,11 +91,22 @@ def webhook(request: HttpRequest) -> HttpResponse:
         if message['message'].get('text') is None:
             continue
         logger.info(str(message))
-        _handle_received_message(
-            str(message['sender']['id']),
-            str(message['message']['text']),
-            message['message'].get('quick_reply', {}).get('payload'),
-        )
+        sender_psid = str(message['sender']['id'])
+
+        try:
+            _handle_received_message(
+                sender_psid,
+                str(message['message']['text']),
+                message['message'].get('quick_reply', {}).get('payload'),
+            )
+        except BaseException:
+            error = traceback.format_exc()
+            send_message(
+                sender_psid,
+                "Sorry. Something went wrong while handling that message. " +
+                    "I hope this helps:\n\n```{}```".format(error),
+            )
+
 
     return HttpResponse('Message Processed')
 
