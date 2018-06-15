@@ -58,3 +58,17 @@ class TurnOffThermostatMessageHandler(MessageHandler):
         broadcast_message("Okay! I'll go ahead and turn off the thermostat")
         await Thermostat().async_set_mode(ThermostatMode.OFF)
 
+
+class YouLookNiceMessageHandler(MessageHandler):
+    def should_handle_message(self, message: ReceivedMessage) -> bool:
+        if not any(word in message.text for word in ['nice', 'beautiful', 'good', 'great']):
+            return False
+
+        return 'look' in message.text
+
+    async def async_handle_message(self, message: ReceivedMessage) -> None:
+        send_message(
+            message.sender_psid,
+            'Awww, you look beautful too!',
+        )
+
