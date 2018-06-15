@@ -69,6 +69,6 @@ class YouLookNiceMessageHandler(MessageHandler):
     async def async_handle_message(self, message: ReceivedMessage) -> None:
         send_message(
             message.sender_psid,
-            'Awww, you look beautful too!',
+            'Awww, you look beautiful too!',
         )
 
