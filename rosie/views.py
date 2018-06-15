@@ -10,15 +10,15 @@ from django.http import (
     HttpResponse,
 )
 from django.views.decorators.csrf import csrf_exempt
-from home.thermostat import (
-    Thermostat,
-    ThermostatMode,
-)
 from os import environ as env
+from rosie.handlers import MessageHandler
 from rosie.messaging import (send_message, broadcast_message)
 from rosie.models import SubscribedUser
-from weather import (Weather, Unit)
-from typing import Optional
+from rosie.types import ReceivedMessage
+from typing import (
+    Any,
+    Dict,
+)
 from util.async import sync
 
 
@@ -27,42 +27,25 @@ logger = logging.getLogger(__name__)
 
 
 @sync
-async def _handle_received_message(
-    sender_psid: str,
-    text: str,
-    payload: Optional[str],
-) -> None:
-    SubscribedUser(user_psid=sender_psid).save()
+async def _handle_received_message(message: ReceivedMessage) -> None:
+    SubscribedUser(user_psid=message.sender_psid).save()
 
-    if payload == 'TURN_OFF_THERMOSTAT':
-        broadcast_message("Okay! I'll go ahead and turn off the thermostat")
-        await Thermostat().async_set_mode(ThermostatMode.OFF)
+    for message_handler_class in MessageHandler.__subclasses__():
+        message_handler = message_handler_class()
+        if not message_handler.should_handle_message(message):
+            continue
+        await message_handler.async_handle_message(message)
         return
 
-    content = text.strip().lower()
+    send_message(message.sender_psid, "Sorry, I didn't understand that.")
 
-    if 'weather' in content:
-        weather = Weather(unit=Unit.CELSIUS)
-        lookup = weather.lookup(12761323)
-        send_message(
-            sender_psid,
-            'It is currently %s°C and %s' % (
-                lookup.condition.temp,
-                lookup.condition.text,
-            ),
-        )
-        return
 
-    if ('anyone' in content or 'someone' in content) and 'home' in content:
-        thermostat_status = await Thermostat().async_read_status()
-        send_message(
-            sender_psid,
-            'I don\'t think anyone is home.' if thermostat_status.is_away \
-                    else 'Yup, someone is home.'
-        )
-        return
-
-    send_message(sender_psid, "Sorry, I didn't understand that.")
+def _parse_message(message: Dict[str, Any]) -> ReceivedMessage:
+    return ReceivedMessage(
+        sender_psid=str(message['sender']['id']),
+        text=str(message['message']['text']).strip().lower(),
+        payload=message['message'].get('quick_reply', {}).get('payload'),
+    )
 
 
 @csrf_exempt
@@ -102,18 +85,15 @@ def webhook(request: HttpRequest) -> HttpResponse:
         if message['message'].get('text') is None:
             continue
         logger.info(str(message))
-        sender_psid = str(message['sender']['id'])
+
+        parsed_message = _parse_message(message)
 
         try:
-            _handle_received_message(
-                sender_psid,
-                str(message['message']['text']),
-                message['message'].get('quick_reply', {}).get('payload'),
-            )
+            _handle_received_message(parsed_message)
         except BaseException:
             error = traceback.format_exc()
             send_message(
-                sender_psid,
+                parsed_message.sender_psid,
                 "Sorry. Something went wrong while handling that message. " +
                     "I hope this helps:\n\n```{}```".format(error),
             )

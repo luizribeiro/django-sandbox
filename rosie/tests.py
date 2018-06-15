@@ -223,7 +223,7 @@ class RosieWebHookTests(TestCase):
     def test_replies_with_weather(self) -> None:
         lookup = Mock(condition=Mock(text='Cloudy', temp='16'))
         with patch(
-            'rosie.views.Weather.lookup',
+            'rosie.handlers.Weather.lookup',
             return_value=lookup,
         ), GraphAPIMock() as graph_api_mock:
             self._send_message_to_webhook('42', 'tell me the weather')
