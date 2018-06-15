@@ -7,7 +7,12 @@ from rosie.messaging import (
     send_message,
 )
 from rosie.types import ReceivedMessage
+from typing import List
 from weather import (Weather, Unit)
+
+
+def has_any_word(message: ReceivedMessage, words: List[str]) -> bool:
+        return any(word in message.text for word in words)
 
 
 class MessageHandler:
@@ -36,7 +41,7 @@ class WeatherMessageHandler(MessageHandler):
 
 class IsAnyoneHomeMessageHandler(MessageHandler):
     def should_handle_message(self, message: ReceivedMessage) -> bool:
-        if 'anyone' not in message.text and 'someone' not in message.text:
+        if not has_any_word(message, ['anyone', 'someone']):
             return False
 
         return 'home' in message.text
@@ -61,7 +66,7 @@ class TurnOffThermostatMessageHandler(MessageHandler):
 
 class YouLookNiceMessageHandler(MessageHandler):
     def should_handle_message(self, message: ReceivedMessage) -> bool:
-        if not any(word in message.text for word in ['nice', 'beautiful', 'good', 'great']):
+        if not has_any_word(message, ['nice', 'beautiful', 'good', 'great']):
             return False
 
         return 'look' in message.text
