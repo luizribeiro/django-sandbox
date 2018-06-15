@@ -15,7 +15,11 @@ from typing import (
     List,
     NamedTuple,
 )
-from unittest.mock import (patch, Mock)
+from unittest.mock import (
+    MagicMock,
+    Mock,
+    patch,
+)
 from util.async import sync
 from util.tests import set_env
 
@@ -227,6 +231,33 @@ class RosieWebHookTests(TestCase):
             self.assertIn(SentMessage(
                 recipient_psid='42',
                 text='It is currently 16°C and Cloudy',
+            ), graph_api_mock.sent_messages)
+
+    def test_answers_if_someone_is_home(self) -> None:
+        nest_mock = MagicMock(
+            thermostats=[
+                MagicMock(
+                    structure=MagicMock(away='away'),
+                ),
+            ],
+        )
+        # TODO mock home.thermostat.Thermostat instead, first I need to get async mocks working though
+        with patch('home.thermostat.Nest', return_value=nest_mock), \
+                GraphAPIMock() as graph_api_mock:
+            self._send_message_to_webhook('42', 'is anyone home?')
+            self.assertEquals(len(graph_api_mock.sent_messages), 1)
+            self.assertIn(SentMessage(
+                recipient_psid='42',
+                text='I don\'t think anyone is home.',
+            ), graph_api_mock.sent_messages)
+
+            graph_api_mock.clear()
+            nest_mock.thermostats[0].structure.away = 'home'
+            self._send_message_to_webhook('42', 'is anyone home?')
+            self.assertEquals(len(graph_api_mock.sent_messages), 1)
+            self.assertIn(SentMessage(
+                recipient_psid='42',
+                text='Yup, someone is home.',
             ), graph_api_mock.sent_messages)
 
     def test_error_handling(self) -> None:

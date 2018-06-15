@@ -39,7 +39,9 @@ async def _handle_received_message(
         await Thermostat().async_set_mode(ThermostatMode.OFF)
         return
 
-    if 'weather' in text.strip().lower():
+    content = text.strip().lower()
+
+    if 'weather' in content:
         weather = Weather(unit=Unit.CELSIUS)
         lookup = weather.lookup(12761323)
         send_message(
@@ -48,6 +50,15 @@ async def _handle_received_message(
                 lookup.condition.temp,
                 lookup.condition.text,
             ),
+        )
+        return
+
+    if ('anyone' in content or 'someone' in content) and 'home' in content:
+        thermostat_status = await Thermostat().async_read_status()
+        send_message(
+            sender_psid,
+            'I don\'t think anyone is home.' if thermostat_status.is_away \
+                    else 'Yup, someone is home.'
         )
         return
 
