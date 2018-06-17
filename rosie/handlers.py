@@ -27,7 +27,7 @@ class MessageHandler:
 
 
 class PayloadMessageHandler:
-    payload: Optional[str] = None
+    payload = None  # type: Optional[str]
 
     def should_handle_message(self, message: ReceivedMessage) -> bool:
         if self.payload == None:
