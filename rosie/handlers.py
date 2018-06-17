@@ -78,6 +78,10 @@ class TurnOffThermostatMessageHandler(PayloadMessageHandler):
         await Thermostat().async_set_mode(ThermostatMode.OFF)
 
 
+class NoopMessageHandler(PayloadMessageHandler):
+    payload = 'NOOP'
+
+
 class YouLookNiceMessageHandler(MessageHandler):
     def should_handle_message(self, message: ReceivedMessage) -> bool:
         if not has_any_word(message, ['nice', 'beautiful', 'good', 'great']):
