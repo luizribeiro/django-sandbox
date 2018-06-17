@@ -7,7 +7,10 @@ from rosie.messaging import (
     send_message,
 )
 from rosie.types import ReceivedMessage
-from typing import List
+from typing import (
+    List,
+    Optional,
+)
 from weather import (Weather, Unit)
 
 
@@ -18,6 +21,18 @@ def has_any_word(message: ReceivedMessage, words: List[str]) -> bool:
 class MessageHandler:
     def should_handle_message(self, message: ReceivedMessage) -> bool:
         raise NotImplementedError()
+
+    async def async_handle_message(self, message: ReceivedMessage) -> None:
+        pass
+
+
+class PayloadMessageHandler:
+    payload: Optional[str] = None
+
+    def should_handle_message(self, message: ReceivedMessage) -> bool:
+        if self.payload == None:
+            raise NotImplementedError()
+        return message.payload == self.payload
 
     async def async_handle_message(self, message: ReceivedMessage) -> None:
         pass
@@ -55,9 +70,8 @@ class IsAnyoneHomeMessageHandler(MessageHandler):
         )
 
 
-class TurnOffThermostatMessageHandler(MessageHandler):
-    def should_handle_message(self, message: ReceivedMessage) -> bool:
-        return message.payload == 'TURN_OFF_THERMOSTAT'
+class TurnOffThermostatMessageHandler(PayloadMessageHandler):
+    payload = 'TURN_OFF_THERMOSTAT'
 
     async def async_handle_message(self, message: ReceivedMessage) -> None:
         broadcast_message("Okay! I'll go ahead and turn off the thermostat")
