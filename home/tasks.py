@@ -25,7 +25,7 @@ def _log(s: str) -> None:
     sys.stdout.flush()
 
 
-@scheduler.scheduled_job('interval', minutes=5)
+@scheduler.scheduled_job('interval', minutes=1)
 async def check_on_vacuum() -> None:
     _log('Checking on Vacuum...')
     try:
