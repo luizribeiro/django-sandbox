@@ -226,14 +226,24 @@ class TaskTests(TransactionTestCase):
             self.assertTrue(start_mock.called)
             self.assertTrue('Re-starting Vacuum...' in stdout.getvalue())
 
-            # shouldn't restart sooner than 30 min
+            # ...then it restarts again
+            await home.tasks.check_on_vacuum()
+            self.assertTrue(start_mock.called)
+            self.assertTrue('Re-starting Vacuum...' in stdout.getvalue())
+
+            # shouldn't restart sooner than 10 min
             start_mock.reset_mock()
-            time_mock.return_value += 29 * 60
+            time_mock.return_value += 9 * 60
             await home.tasks.check_on_vacuum()
             self.assertFalse(start_mock.called)
 
-            # after 30 min is okay
+            # after 10 min is okay
             time_mock.return_value += 1 * 60
+            await home.tasks.check_on_vacuum()
+            self.assertTrue(start_mock.called)
+
+            # then restarts again after 30 min
+            time_mock.return_value += 30 * 60
             await home.tasks.check_on_vacuum()
             self.assertTrue(start_mock.called)
 

@@ -12,8 +12,10 @@ from home.vacuum import (
 
 
 RESTART_TIMEOUT = [
-    0,  # restart once immediately
-    30 * 60,  # twice after 30 min
+    0,
+    0,  # restart immediately 2 times
+    10 * 60,  # then wait 10 minutes
+    30 * 60,  # then wait 30 minutes
     24 * 60 * 60,  # then only the next day
 ]
 
@@ -23,7 +25,7 @@ def _log(s: str) -> None:
     sys.stdout.flush()
 
 
-@scheduler.scheduled_job('interval', minutes=10)
+@scheduler.scheduled_job('interval', minutes=5)
 async def check_on_vacuum() -> None:
     _log('Checking on Vacuum...')
     try:
@@ -37,9 +39,10 @@ async def check_on_vacuum() -> None:
         num_restarts = int(get_value_or_default('num_vacuum_restarts', 0))
         time_since_restart = current_time - last_restart
 
+        current_timeout = RESTART_TIMEOUT[num_restarts % len(RESTART_TIMEOUT)]
         if state == VacuumState.ERROR \
                 and error == VacuumError.CLEAN_MAIN_BRUSH \
-                and time_since_restart >= RESTART_TIMEOUT[num_restarts % 3]:
+                and time_since_restart >= current_timeout:
             _log('Re-starting Vacuum...')
             await Vacuum().async_start()
             set_key_value('last_vacuum_restart', current_time)
